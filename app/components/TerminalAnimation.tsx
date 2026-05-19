@@ -2,91 +2,59 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 
-interface Line {
-  text: string;
-  color: 'green' | 'red' | 'amber' | 'dim';
+const CAUSES = [
+  'undefined value proposition',
+  'CTA buried beyond human reach',
+  'hero section: 0 humans understood it',
+  'copy last updated: never',
+  'seamless detected 4 times. nothing was seamless.',
+];
+
+const LAST_WORDS = [
+  '"we are revolutionizing the industry"',
+  '"seamless integration"',
+  '"game-changing solution"',
+  '"schedule a call to learn more"',
+  '"streamline your workflow"',
+];
+
+interface LineSpec {
+  label: string;
+  value: string;
+  valueColor: 'white' | 'red' | 'green';
+  bold?: boolean;
+  empty?: boolean;
 }
 
-function pick<T>(arr: T[], n: number): T[] {
-  return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+function buildLines(domain: string): LineSpec[] {
+  const date = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const cause = CAUSES[Math.floor(Math.random() * CAUSES.length)];
+  const lastWords = LAST_WORDS[Math.floor(Math.random() * LAST_WORDS.length)];
+
+  return [
+    { label: 'PATIENT:', value: domain, valueColor: 'white' },
+    { label: 'DATE OF ADMISSION:', value: date, valueColor: 'white' },
+    { label: 'PROGNOSIS:', value: 'critical', valueColor: 'red' },
+    { label: '', value: '', valueColor: 'white', empty: true },
+    { label: 'CAUSE OF DEATH:', value: cause, valueColor: 'white' },
+    { label: 'TIME OF DEATH:', value: 'the moment the hero section loaded', valueColor: 'white' },
+    { label: 'LAST WORDS:', value: lastWords, valueColor: 'white' },
+    { label: '', value: '', valueColor: 'white', empty: true },
+    { label: 'EXAMINING PHYSICIAN:', value: 'getroasted.wtf AI', valueColor: 'white' },
+    { label: 'VERDICT:', value: 'roast incoming. brace yourself.', valueColor: 'red', bold: true },
+    { label: '', value: '', valueColor: 'white', empty: true },
+    { label: '', value: 'compiling damage report...', valueColor: 'green' },
+  ];
 }
 
-function buildLines(domain: string): Line[] {
-  const greenPool = [
-    '$ asking my dog to review the CTA... he left the room',
-    '$ showing this to a 5 year old... still waiting for an answer',
-    '$ consulting a fortune cookie for the value prop...',
-    '$ asking ChatGPT to explain the hero section... it also gave up',
-    "$ checking if your mom would understand this... she doesn't",
-    '$ showing this to my goldfish... he bounced',
-    '$ asking a random person on the street... they walked faster',
-    '$ checking if anyone has scrolled past the fold... logs say no',
-    '$ asking your ex if the value prop makes sense... no response',
-    '$ consulting the magic 8-ball for conversion rate...',
-    '$ running npm install common-sense...',
-    '$ checking if the pricing page makes sense... calculator crashed',
-    '$ asking your therapist about this landing page... new session booked',
-    "$ showing this to your investor... he's on another call now",
-    '$ checking if a goldfish has longer attention span than this hero section...',
-    '$ asking the janitor if the copy makes sense... he quit',
-    '$ running git blame on the value prop...',
-    '$ checking if this was written by a human... jury still out',
-    '$ measuring distance between CTA and human comprehension...',
-  ];
-
-  const redPool = [
-    '> ERROR: not even my dog would click this CTA',
-    "> ERROR: your mom wouldn't find the CTA with glasses and a flashlight",
-    '> ERROR: value prop: undefined. literally.',
-    '> ERROR: even the 404 page is more memorable than this',
-    "> ERROR: bro wrote 'revolutionary' and went to sleep",
-    "> ERROR: 'game-changing' detected. throwing exception.",
-    '> ERROR: scroll depth: 0.2. everyone left at the hero.',
-    '> ERROR: my goldfish has a longer attention span than this page',
-    '> ERROR: even the back button felt bad about leaving',
-    '> ERROR: CTA button leads to a waitlist. you played yourself.',
-    '> ERROR: I asked 3 people what this does. 3 different answers.',
-    '> ERROR: your ex understood the value prop. that\'s the only person.',
-    '> ERROR: social proof: null. three testimonials with no faces.',
-    '> ERROR: hero image is stock photo of people laughing at laptops. classic.',
-    "> ERROR: 'streamline' is deprecated since 2019. still here tho.",
-  ];
-
-  const amberPool = [
-    '> WARNING: copy was definitely written by committee at 5pm on Friday',
-    '> WARNING: even ChatGPT would be embarrassed by this copy',
-    '> WARNING: O(n) buzzwords detected. performance critical.',
-    '> WARNING: Figma template shipped to production unsupervised',
-    "> WARNING: 'seamless' detected 4 times. nothing is seamless.",
-    '> WARNING: pricing tiers named Basic/Pro/Enterprise. groundbreaking.',
-    "> WARNING: the CTA says 'Get Started'. started what exactly?",
-    '> WARNING: your designer friend already closed this tab',
-    '> WARNING: last 3 churned customers cited this page as reason',
-    '> WARNING: even the janitor had notes on the copy',
-  ];
-
-  const domain_line: Line = { text: `$ fetching target: ${domain}...`, color: 'green' };
-
-  const midLines: Line[] = [
-    ...pick(greenPool, 4).map((t) => ({ text: t, color: 'green' as const })),
-    ...pick(redPool, 3).map((t) => ({ text: t, color: 'red' as const })),
-    ...pick(amberPool, 2).map((t) => ({ text: t, color: 'amber' as const })),
-  ].sort(() => Math.random() - 0.5);
-
-  const finalLines: Line[] = [
-    { text: '$ compiling roast...', color: 'green' },
-    { text: '$ deploying brutality --no-mercy --no-chill...', color: 'green' },
-    { text: '> roast ready. this is going to hurt. a lot.', color: 'red' },
-  ];
-
-  return [domain_line, ...midLines, ...finalLines];
-}
-
-const C = {
-  green: '#639922',
+const VALUE_COLORS = {
+  white: '#ffffff',
   red: '#E24B4A',
-  amber: '#EF9F27',
-  dim: '#71717a',
+  green: '#639922',
 } as const;
 
 interface Props {
@@ -96,10 +64,12 @@ interface Props {
 }
 
 export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
+  const caseNum = useMemo(() => String(Math.floor(1000 + Math.random() * 9000)), []);
   const lines = useMemo(() => buildLines(domain), [domain]);
 
-  const [completedLines, setCompletedLines] = useState<Line[]>([]);
-  const [currentText, setCurrentText] = useState('');
+  const [completedLines, setCompletedLines] = useState<LineSpec[]>([]);
+  const [currentValue, setCurrentValue] = useState('');
+  const [stamp, setStamp] = useState(false);
   const [phase, setPhase] = useState<'typing' | 'waiting' | 'done'>('typing');
 
   const lineIdxRef = useRef(0);
@@ -113,7 +83,7 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
 
   const finish = useCallback(() => {
     setPhase('done');
-    onDoneRef.current();
+    setTimeout(() => onDoneRef.current(), 500);
   }, []);
 
   useEffect(() => {
@@ -123,13 +93,15 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
   }, [apiReady, phase, finish]);
 
   useEffect(() => {
-    const CHAR_MS = 40;
-    const LINE_MS = 120;
+    const CHAR_MS = 35;
+    const LINE_PAUSE = 160;
+    const EMPTY_PAUSE = 80;
 
     function tick() {
       const idx = lineIdxRef.current;
 
       if (idx >= lines.length) {
+        setStamp(true);
         if (apiReadyRef.current) {
           finish();
         } else {
@@ -139,75 +111,219 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
       }
 
       const line = lines[idx];
+
+      if (line.empty) {
+        setCompletedLines((prev) => [...prev, line]);
+        lineIdxRef.current = idx + 1;
+        charIdxRef.current = 0;
+        timerRef.current = setTimeout(tick, EMPTY_PAUSE);
+        return;
+      }
+
+      const target = line.value;
       const charIdx = charIdxRef.current;
 
-      if (charIdx < line.text.length) {
+      if (charIdx < target.length) {
         charIdxRef.current = charIdx + 1;
-        setCurrentText(line.text.slice(0, charIdx + 1));
+        setCurrentValue(target.slice(0, charIdx + 1));
         timerRef.current = setTimeout(tick, CHAR_MS);
       } else {
         setCompletedLines((prev) => [...prev, line]);
-        setCurrentText('');
+        setCurrentValue('');
         lineIdxRef.current = idx + 1;
         charIdxRef.current = 0;
-        timerRef.current = setTimeout(tick, LINE_MS);
+        timerRef.current = setTimeout(tick, LINE_PAUSE);
       }
     }
 
-    timerRef.current = setTimeout(tick, 150);
+    timerRef.current = setTimeout(tick, 400);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const activeColor =
-    lineIdxRef.current < lines.length
-      ? C[lines[lineIdxRef.current].color]
-      : C.green;
+  // Current line being typed (derived from completedLines count)
+  const currentLineSpec =
+    completedLines.length < lines.length ? lines[completedLines.length] : null;
+
+  const cursorColor =
+    currentLineSpec ? VALUE_COLORS[currentLineSpec.valueColor] : VALUE_COLORS.green;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(6px)' }}
+    >
       <div
-        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px)',
+          width: 'min(600px, 90vw)',
+          backgroundColor: '#080808',
+          border: '1px solid #333',
+          borderRadius: 8,
+          overflow: 'hidden',
+          position: 'relative',
         }}
-      />
-
-      <div className="relative w-full max-w-2xl mx-auto px-8 pt-20 font-mono text-sm leading-7">
-        {completedLines.map((line, i) => (
-          <div key={i} style={{ color: C[line.color] }}>
-            {line.text || ' '}
-          </div>
-        ))}
-
-        {phase === 'typing' && (
-          <div style={{ color: activeColor }}>
-            {currentText}
+      >
+        {/* Diagonal COOKED stamp */}
+        {stamp && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+              zIndex: 1,
+            }}
+          >
             <span
-              className="inline-block w-2 h-4 ml-0.5 align-middle"
               style={{
-                backgroundColor: activeColor,
-                animation: 'blink 1s step-start infinite',
+                fontSize: 72,
+                fontWeight: 900,
+                color: '#E24B4A',
+                opacity: 0.08,
+                transform: 'rotate(-20deg)',
+                letterSpacing: '0.1em',
+                fontFamily: 'monospace',
+                userSelect: 'none',
               }}
-            />
+            >
+              COOKED
+            </span>
           </div>
         )}
 
-        {phase === 'waiting' && (
-          <div style={{ color: C.amber }}>
-            {'$ waiting for AI to stop laughing...'}
-            <span
-              className="inline-block w-2 h-4 ml-0.5 align-middle"
-              style={{
-                backgroundColor: C.amber,
-                animation: 'blink 1s step-start infinite',
-              }}
-            />
-          </div>
-        )}
+        {/* Document header */}
+        <div
+          style={{
+            backgroundColor: '#0f0f0f',
+            borderBottom: '1px solid #222',
+            padding: '16px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'monospace',
+              fontSize: 11,
+              color: '#E24B4A',
+              letterSpacing: '0.2em',
+            }}
+          >
+            ● CLASSIFIED
+          </span>
+          <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#666' }}>
+            AUTOPSY REPORT
+          </span>
+          <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#444' }}>
+            CASE #{caseNum}
+          </span>
+        </div>
+
+        {/* Document body */}
+        <div
+          style={{
+            padding: '28px 32px',
+            fontFamily: 'monospace',
+            fontSize: 13,
+            lineHeight: 2,
+          }}
+        >
+          {completedLines.map((line, i) =>
+            line.empty ? (
+              <div key={i} style={{ height: '0.5em' }} />
+            ) : (
+              <div key={i}>
+                {line.label && (
+                  <span
+                    style={{
+                      color: '#555',
+                      marginRight: 12,
+                      minWidth: 200,
+                      display: 'inline-block',
+                    }}
+                  >
+                    {line.label}
+                  </span>
+                )}
+                <span
+                  style={{
+                    color: VALUE_COLORS[line.valueColor],
+                    fontWeight: line.bold ? 700 : 400,
+                  }}
+                >
+                  {line.value}
+                </span>
+              </div>
+            )
+          )}
+
+          {/* Currently typing line */}
+          {phase === 'typing' && currentLineSpec && !currentLineSpec.empty && (
+            <div>
+              {currentLineSpec.label && (
+                <span
+                  style={{
+                    color: '#555',
+                    marginRight: 12,
+                    minWidth: 200,
+                    display: 'inline-block',
+                  }}
+                >
+                  {currentLineSpec.label}
+                </span>
+              )}
+              <span
+                style={{
+                  color: VALUE_COLORS[currentLineSpec.valueColor],
+                  fontWeight: currentLineSpec.bold ? 700 : 400,
+                }}
+              >
+                {currentValue}
+              </span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 7,
+                  height: 13,
+                  backgroundColor: cursorColor,
+                  marginLeft: 2,
+                  verticalAlign: 'middle',
+                  animation: 'blink 1s step-start infinite',
+                }}
+              />
+            </div>
+          )}
+
+          {/* Waiting for API */}
+          {phase === 'waiting' && (
+            <div style={{ color: '#EF9F27' }}>
+              // analyzing cause of death...
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 7,
+                  height: 13,
+                  backgroundColor: '#EF9F27',
+                  marginLeft: 4,
+                  verticalAlign: 'middle',
+                  animation: 'blink 1s step-start infinite',
+                }}
+              />
+            </div>
+          )}
+
+          {/* Confirmed — navigating */}
+          {phase === 'done' && (
+            <div style={{ color: '#639922' }}>
+              // cause of death confirmed. loading roast...
+            </div>
+          )}
+        </div>
       </div>
 
       <style>{`
