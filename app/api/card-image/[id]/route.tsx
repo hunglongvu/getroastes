@@ -29,6 +29,7 @@ function diagnosis(score: number): string {
 }
 
 const W = 800;
+const H = 900;
 const PAD = 56;
 
 export async function GET(
@@ -52,59 +53,63 @@ export async function GET(
         style={{
           background: '#080808',
           width: `${W}px`,
+          height: `${H}px`,
           display: 'flex',
           flexDirection: 'column',
-          padding: `${PAD}px`,
           color: '#e5e5e5',
         }}
       >
-        {/* TOP ROW: domain left · diagnosis right */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        {/* 1. HEADER ROW */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: `${PAD}px ${PAD}px 16px ${PAD}px`,
+        }}>
           <span style={{ color: '#555', fontSize: 13, fontFamily: 'monospace' }}>{roast.domain}</span>
           <span style={{ color: rColor, fontSize: 12, fontFamily: 'monospace', letterSpacing: '0.15em' }}>{diag}</span>
         </div>
 
-        {/* SCREENSHOT */}
+        {/* 2. SCREENSHOT — full bleed */}
         {screenshotSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={screenshotSrc}
             alt={roast.domain}
-            width={W - PAD * 2}
-            height={220}
-            style={{ objectFit: 'cover', objectPosition: 'top', borderRadius: 8, border: '1px solid #1e1e1e', marginBottom: 32 }}
+            width={W}
+            height={300}
+            style={{ objectFit: 'cover', objectPosition: 'top' }}
           />
         ) : (
-          <div style={{ width: W - PAD * 2, height: 220, background: '#111', borderRadius: 8, border: '1px solid #1e1e1e', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: W, height: 300, background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: '#333', fontSize: 12 }}>no screenshot</span>
           </div>
         )}
 
-        {/* SURVIVAL RATE NUMBER */}
-        <div style={{ fontSize: 120, fontWeight: 900, letterSpacing: -5, lineHeight: 1, color: sColor, display: 'flex' }}>
-          {roast.score}%
+        {/* 3. SCORE BLOCK */}
+        <div style={{ display: 'flex', flexDirection: 'column', padding: `40px ${PAD}px 0 ${PAD}px` }}>
+          <div style={{ fontSize: 180, fontWeight: 900, letterSpacing: -8, lineHeight: 1, color: sColor, display: 'flex' }}>
+            {roast.score}%
+          </div>
+          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: '#333', marginTop: 8, display: 'flex', fontFamily: 'monospace' }}>
+            COOKED SCORE
+          </div>
         </div>
 
-        {/* SURVIVAL RATE LABEL */}
-        <div style={{ fontSize: 12, letterSpacing: '0.2em', color: '#444', marginTop: 8, marginBottom: 24, display: 'flex', fontFamily: 'monospace' }}>
-          COOKED SCORE
-        </div>
+        {/* 4. DIVIDER */}
+        <div style={{ height: 1, background: '#1a1a1a', margin: `24px ${PAD}px`, display: 'flex' }} />
 
-        {/* DIVIDER */}
-        <div style={{ width: '100%', height: 1, background: '#1a1a1a', marginBottom: 24, display: 'flex' }} />
-
-        {/* ROAST QUOTE */}
-        <div style={{ fontSize: 24, lineHeight: 1.4, color: '#e5e5e5', display: 'flex', flexWrap: 'wrap' }}>
+        {/* 5. ROAST QUOTE */}
+        <div style={{ fontSize: 28, fontWeight: 500, lineHeight: 1.4, color: '#e5e5e5', padding: `0 ${PAD}px 48px ${PAD}px`, display: 'flex', flexWrap: 'wrap' }}>
           &ldquo;{roast.roast}&rdquo;
         </div>
 
-        {/* BOTTOM BAR */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 36 }}>
-          <span style={{ color: '#333', fontSize: 11, fontFamily: 'monospace' }}>getroasted.wtf</span>
-          <span style={{ color: rColor, fontSize: 11, fontFamily: 'monospace' }}>{diag}</span>
+        {/* 6. BOTTOM BAR */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', padding: `0 ${PAD}px 40px ${PAD}px`, marginTop: 'auto' }}>
+          <span style={{ color: '#222', fontSize: 11, fontFamily: 'monospace' }}>getroasted.wtf</span>
         </div>
       </div>
     ),
-    { width: W },
+    { width: W, height: H },
   );
 }
