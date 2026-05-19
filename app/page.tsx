@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
+import { Embers } from './components/Embers';
+import { RoastCounter } from './components/RoastCounter';
 import { getHallOfShame } from '@/lib/store';
 import { RARITY_STYLES } from '@/lib/rarity';
 
@@ -68,6 +70,8 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen bg-black text-white">
+      <Embers />
+
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
@@ -85,6 +89,7 @@ export default async function HomePage() {
         <p className="mt-5 text-zinc-600 text-xs font-mono">
           3 free roasts/day · no signup · no mercy
         </p>
+        <RoastCounter />
       </section>
 
       {/* 2 · Hall of Shame preview */}
