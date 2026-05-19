@@ -45,22 +45,22 @@ export function FloatingRoasts() {
   const [items, setItems] = useState<FloatingItem[]>([]);
 
   useEffect(() => {
-    const generated = Array.from({ length: 15 }, (_, i) => ({
+    const generated = Array.from({ length: 8 }, (_, i) => ({
       id: i,
       text: ROASTS[Math.floor(Math.random() * ROASTS.length)],
       x: Math.random() * 100,
       y: Math.random() * 100,
       duration: 20 + Math.random() * 30,
       delay: Math.random() * 20,
-      size: 10 + Math.random() * 4,
-      opacity: 0.03 + Math.random() * 0.07,
+      size: 9 + Math.random() * 2,
+      opacity: 0.025 + Math.random() * 0.02,
       rotate: -15 + Math.random() * 30,
     }));
     setItems(generated);
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: -1 }}>
       {items.map((item) => (
         <div
           key={item.id}
@@ -70,7 +70,7 @@ export function FloatingRoasts() {
             top: `${item.y}%`,
             fontSize: `${item.size}px`,
             opacity: item.opacity,
-            color: '#E24B4A',
+            color: '#ffffff',
             animation: `float-${item.id % 3} ${item.duration}s ${item.delay}s infinite linear`,
             transform: `rotate(${item.rotate}deg)`,
           }}

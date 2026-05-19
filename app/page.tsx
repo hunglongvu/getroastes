@@ -74,7 +74,7 @@ export default async function HomePage() {
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
-          <span className="text-white">First the AI roasts you.</span>
+          <span className="text-white">First the AI <span className="fire-text">roasts</span> you.</span>
           <br />
           <span className="text-[#E24B4A]">Then the internet does.</span>
         </h1>

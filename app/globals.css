@@ -17,6 +17,19 @@ body {
   color: var(--foreground);
 }
 
+@keyframes fire-flicker {
+  0%   { color: #E24B4A; text-shadow: 0 0 10px #E24B4A, 0 0 20px #ff4400, 0 0 40px #ff2200; }
+  25%  { color: #ff6b35; text-shadow: 0 0 15px #ff6b35, 0 0 30px #ff4400, 0 0 60px #ff2200, 0 0 80px #ff0000; }
+  50%  { color: #E24B4A; text-shadow: 0 0 8px #E24B4A, 0 0 15px #ff4400, 0 0 30px #ff2200; }
+  75%  { color: #ff8c42; text-shadow: 0 0 20px #ff8c42, 0 0 40px #ff4400, 0 0 70px #ff2200, 0 0 100px #ff0000; }
+  100% { color: #E24B4A; text-shadow: 0 0 10px #E24B4A, 0 0 20px #ff4400, 0 0 40px #ff2200; }
+}
+
+.fire-text {
+  animation: fire-flicker 1.5s ease-in-out infinite;
+  display: inline;
+}
+
 @keyframes float-0 {
   0% { transform: translateY(0px) rotate(-10deg); opacity: 0; }
   10% { opacity: 1; }
