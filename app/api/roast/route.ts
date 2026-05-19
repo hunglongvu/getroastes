@@ -44,24 +44,6 @@ rules:
 
 ---
 
-FIELD: "stderr" — 2 sentences. same energy.
-
-like texting a friend who just sent you a startup link.
-**bold** 2-3 specific things from the page.
-
-GOOD:
-- "the name sounds like what a 14-year-old calls his gaming clan. whoever approved this homepage has never spoken to a customer."
-- "**the waitlist** implies demand — the page implies hope. one of these is enough to launch apparently."
-- "i've seen more clarity on a fortune cookie. **whoever wrote this copy** was definitely a growth hacker in a past life."
-
-rules:
-- 2 sentences max
-- **bold** 2-3 specific things
-- no: "appears", "suggests", "indicates", "screenshot", "UI", "UX", "consider"
-- casual and mean, not analytical
-
----
-
 SCORING — 100 = fully cooked/worthless, 0 = actually good:
 - 80-100: completely cooked — no value prop, no idea what it does, looks unfinished
 - 60-79: pretty bad — generic copy, buried CTA, zero credibility
@@ -75,14 +57,12 @@ typical bad SaaS page should score 70-95. lean harsh.
 return ONLY valid JSON, no markdown, no backticks:
 {
   "score": integer 0-100,
-  "roastLine": "exactly 2 sentences. max 30 words total. lowercase. sentence 2 is a twist.",
-  "stderr": "two sentences. **bold 2-3 things**. casual mean friend."
+  "roastLine": "exactly 2 sentences. max 30 words total. lowercase. sentence 2 is a twist."
 }`;
 
 type AiResponse = {
   score: number;
   roastLine: string;
-  stderr: string;
 };
 
 export async function POST(request: NextRequest) {
@@ -185,7 +165,7 @@ export async function POST(request: NextRequest) {
     domain,
     score: aiData.score,
     roast: aiData.roastLine,
-    stderr: aiData.stderr,
+    stderr: '',
     tags: [],
     rarity,
     characterName: character.name,
