@@ -136,56 +136,21 @@ export async function GET(
         ],
       ),
 
-      // ── ILLUSTRATION: screenshot background + cat foreground ──
-      {
-        type: 'div',
-        props: {
-          style: { position: 'relative', width: W, height: CAT_H, overflow: 'hidden', backgroundColor: '#0d0d0d', display: 'flex' },
-          children: [
-            // Layer 1: screenshot background
-            roast.screenshotBase64
-              ? {
-                  type: 'img',
-                  props: {
-                    src: `data:image/jpeg;base64,${roast.screenshotBase64}`,
-                    style: {
-                      position: 'absolute', top: 0, left: 0,
-                      width: W, height: CAT_H,
-                      objectFit: 'cover', objectPosition: 'top',
-                      opacity: 0.4,
-                    },
-                  },
-                }
-              : null,
-            // Layer 2: gradient overlay
-            {
-              type: 'div',
-              props: {
-                style: {
-                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                  background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(8,8,8,0.7))',
-                  display: 'flex',
-                },
-              },
+      // ── CAT IMAGE ──
+      catSrc
+        ? {
+            type: 'img',
+            props: {
+              src: catSrc,
+              width: W,
+              height: CAT_H,
+              style: { objectFit: 'cover', objectPosition: 'center top', display: 'block' },
             },
-            // Layer 3: cat foreground centered
-            catSrc
-              ? {
-                  type: 'img',
-                  props: {
-                    src: catSrc,
-                    style: {
-                      position: 'absolute', bottom: 0,
-                      left: (W - 200) / 2,
-                      width: 200, height: 240,
-                      objectFit: 'cover', objectPosition: 'top',
-                    },
-                  },
-                }
-              : null,
-          ].filter(Boolean),
-        },
-      },
+          }
+        : flex(
+            { width: W, height: CAT_H, backgroundColor: '#111', alignItems: 'center', justifyContent: 'center' },
+            [text('no image', { color: '#333', fontSize: 12 })],
+          ),
 
       // ── MOVE BAR ──
       flex(
