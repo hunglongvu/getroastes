@@ -149,7 +149,7 @@ export function RoastCard({ data }: { data: RoastResult }) {
         <div className="relative text-center">
           <div
             className="font-mono leading-none"
-            style={{ fontSize: 72, fontWeight: 800, color, letterSpacing: -3 }}
+            style={{ fontSize: 96, fontWeight: 900, color, letterSpacing: -4, lineHeight: 1 }}
           >
             {data.score}
           </div>
