@@ -33,8 +33,8 @@ export default async function HallOfShamePage() {
           >
             ← getroasted.wtf
           </Link>
-          <h1 className="mt-6 font-mono text-3xl font-bold text-white">
-            // hall of shame
+          <h1 className="mt-6 font-mono text-3xl font-bold" style={{ color: '#FFB800' }}>
+            🏆 Hall of Shame
           </h1>
           <p className="text-zinc-500 font-mono text-sm mt-2">
             the worst landing pages the internet has to offer
@@ -77,8 +77,13 @@ export default async function HallOfShamePage() {
                   }}
                 >
                   {/* Rank */}
-                  <div className="font-mono text-zinc-600 text-sm w-8 flex-none text-right">
-                    #{i + 1}
+                  <div
+                    className="font-mono text-sm w-8 flex-none text-right font-bold"
+                    style={{
+                      color: i === 0 ? '#FFB800' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : undefined,
+                    }}
+                  >
+                    <span className={i >= 3 ? 'text-zinc-500' : ''}>#{i + 1}</span>
                   </div>
 
                   {/* Score */}

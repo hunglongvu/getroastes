@@ -19,7 +19,7 @@ const RARITY_CARDS = [
     rarity: 'LEGENDARY',
     name: 'Giga Cooked Cat',
     emoji: '😿🔥',
-    color: '#f97316',
+    color: '#FFB800',
     dropRate: '8% drop rate',
     meme: 'burned beyond recognition',
     flavor: 'your landing page made the AI feel emotions. bad ones.',
@@ -85,6 +85,96 @@ export default async function HomePage() {
         <p className="mt-5 text-zinc-600 text-xs font-mono">
           3 free roasts/day · no signup · no mercy
         </p>
+      </section>
+
+      {/* Hall of Shame preview */}
+      <section className="px-4 pb-16 max-w-2xl mx-auto">
+        <div className="text-center mb-5">
+          <p className="text-zinc-500 font-mono text-sm">
+            {'// hall of shame — the worst landing pages on the internet'}
+          </p>
+          <p className="text-zinc-600 font-mono text-xs mt-1">
+            updated in real time. opt out anytime from your roast result.
+          </p>
+        </div>
+
+        {topShame.length === 0 ? (
+          <p className="text-zinc-600 font-mono text-sm text-center italic py-8">
+            // no victims yet. be the first.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {topShame.map((roast, i) => {
+              const rarityStyle = RARITY_STYLES[roast.rarity];
+              const color = scoreColor(roast.score);
+              const snippet =
+                roast.roast.length > 50
+                  ? roast.roast.slice(0, 50) + '...'
+                  : roast.roast;
+
+              return (
+                <div
+                  key={roast.id}
+                  className="flex items-center gap-3 rounded-lg px-4 py-3"
+                  style={{
+                    backgroundColor: '#080808',
+                    border: '1px solid #1a1a1a',
+                  }}
+                >
+                  {/* Rank */}
+                  <span className="font-mono text-xs w-6 flex-none font-bold" style={{
+                    color: i === 0 ? '#FFB800' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : '#52525b',
+                  }}>
+                    #{i + 1}
+                  </span>
+
+                  {/* Emoji + rarity */}
+                  <span
+                    className="font-mono text-xs flex-none"
+                    style={{ color: rarityStyle.border }}
+                  >
+                    {roast.characterEmoji}
+                  </span>
+
+                  {/* Domain */}
+                  <span className="font-mono text-white text-xs flex-none max-w-[100px] truncate">
+                    {roast.domain}
+                  </span>
+
+                  {/* Score */}
+                  <span
+                    className="font-mono text-xs font-bold flex-none"
+                    style={{ color }}
+                  >
+                    {roast.score}/100
+                  </span>
+
+                  {/* Roast snippet */}
+                  <span className="font-mono text-zinc-400 text-xs flex-1 min-w-0 truncate hidden sm:block">
+                    &ldquo;{snippet}&rdquo;
+                  </span>
+
+                  {/* View link */}
+                  <Link
+                    href={`/roast/${roast.id}`}
+                    className="font-mono text-zinc-600 text-xs flex-none hover:text-white transition-colors"
+                  >
+                    view →
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="text-center mt-6">
+          <Link
+            href="/hall-of-shame"
+            className="font-mono text-zinc-500 text-xs hover:text-zinc-300 transition-colors"
+          >
+            view full leaderboard →
+          </Link>
+        </div>
       </section>
 
       {/* Rarity showcase */}
@@ -172,94 +262,6 @@ export default async function HomePage() {
         <p className="text-zinc-600 font-mono text-xs text-center mt-8 px-4">
           $ roast --your-page to find out which cat you deserve
         </p>
-      </section>
-
-      {/* Hall of Shame preview */}
-      <section className="px-4 pb-28 max-w-2xl mx-auto">
-        <div className="text-center mb-5">
-          <p className="text-zinc-500 font-mono text-sm">
-            {'// hall of shame — the worst landing pages on the internet'}
-          </p>
-          <p className="text-zinc-600 font-mono text-xs mt-1">
-            updated in real time. opt out anytime from your roast result.
-          </p>
-        </div>
-
-        {topShame.length === 0 ? (
-          <p className="text-zinc-600 font-mono text-sm text-center italic py-8">
-            // no victims yet. be the first.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {topShame.map((roast, i) => {
-              const rarityStyle = RARITY_STYLES[roast.rarity];
-              const color = scoreColor(roast.score);
-              const snippet =
-                roast.roast.length > 50
-                  ? roast.roast.slice(0, 50) + '...'
-                  : roast.roast;
-
-              return (
-                <div
-                  key={roast.id}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3"
-                  style={{
-                    backgroundColor: '#080808',
-                    border: '1px solid #1a1a1a',
-                  }}
-                >
-                  {/* Rank */}
-                  <span className="font-mono text-zinc-600 text-xs w-6 flex-none">
-                    #{i + 1}
-                  </span>
-
-                  {/* Emoji + rarity */}
-                  <span
-                    className="font-mono text-xs flex-none"
-                    style={{ color: rarityStyle.border }}
-                  >
-                    {roast.characterEmoji}
-                  </span>
-
-                  {/* Domain */}
-                  <span className="font-mono text-white text-xs flex-none max-w-[100px] truncate">
-                    {roast.domain}
-                  </span>
-
-                  {/* Score */}
-                  <span
-                    className="font-mono text-xs font-bold flex-none"
-                    style={{ color }}
-                  >
-                    {roast.score}/100
-                  </span>
-
-                  {/* Roast snippet */}
-                  <span className="font-mono text-zinc-400 text-xs flex-1 min-w-0 truncate hidden sm:block">
-                    &ldquo;{snippet}&rdquo;
-                  </span>
-
-                  {/* View link */}
-                  <Link
-                    href={`/roast/${roast.id}`}
-                    className="font-mono text-zinc-600 text-xs flex-none hover:text-white transition-colors"
-                  >
-                    view →
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="text-center mt-6">
-          <Link
-            href="/hall-of-shame"
-            className="font-mono text-zinc-500 text-xs hover:text-zinc-300 transition-colors"
-          >
-            view full leaderboard →
-          </Link>
-        </div>
       </section>
     </main>
   );

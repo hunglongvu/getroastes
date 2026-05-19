@@ -58,10 +58,10 @@ export const RARITY_STYLES: Record<
     bg: 'rgba(217,70,239,0.04)',
   },
   LEGENDARY: {
-    border: '#f97316',
-    glow: '0 0 30px rgba(249,115,22,0.4)',
-    badge: 'text-orange-400',
-    bg: 'rgba(249,115,22,0.04)',
+    border: '#FFB800',
+    glow: '0 0 30px rgba(255,184,0,0.2)',
+    badge: 'text-yellow-400',
+    bg: 'rgba(255,184,0,0.04)',
   },
   EPIC: {
     border: '#8b5cf6',
