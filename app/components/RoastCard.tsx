@@ -29,19 +29,6 @@ function exitCode(score: number): string {
   return 'merge approved';
 }
 
-function tagStyle(type: 'err' | 'warn' | 'ok'): string {
-  if (type === 'err')
-    return 'border border-[#E24B4A]/40 bg-[#E24B4A]/10 text-[#E24B4A]';
-  if (type === 'warn')
-    return 'border border-[#EF9F27]/40 bg-[#EF9F27]/10 text-[#EF9F27]';
-  return 'border border-[#639922]/40 bg-[#639922]/10 text-[#639922]';
-}
-
-function tagIcon(type: 'err' | 'warn' | 'ok'): string {
-  if (type === 'err') return '✗';
-  if (type === 'warn') return '⚠';
-  return '✓';
-}
 
 function parseStderr(text: string): React.ReactNode {
   const parts = text.split(/\*\*(.*?)\*\*/g);
@@ -205,19 +192,6 @@ function CardDisplay({
           <p className="text-white text-xl sm:text-2xl leading-snug font-sans">
             &ldquo;{data.roast}&rdquo;
           </p>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 justify-center mb-8">
-          {data.tags.map((tag, i) => (
-            <span
-              key={i}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono ${tagStyle(tag.type)}`}
-            >
-              <span>{tagIcon(tag.type)}</span>
-              <span>{tag.label}</span>
-            </span>
-          ))}
         </div>
 
         {/* STDERR box */}
