@@ -20,22 +20,24 @@ Must reference something SPECIFIC to this exact product/domain.
 Reads like a devastating one-liner, not a joke.
 Max 15 words.
 
-PERFECT EXAMPLES:
-- "a course about selling yourself, sold by someone who can't explain what they sell"
-- "sells clarity. delivers confusion. the irony is structural."
-- "three animations. zero explanations. hero section is giving TED talk energy with no talk."
-- "boldly promises to 10x your audience. quietly fails to explain how. or what. or why."
-- "a tool for growing on X, with a landing page that would make X users leave X"
-- "the value prop lives somewhere between the third scroll and the user's back button"
-- "personal branding course. no personality detected on landing page. ironic."
-- "ships like it's 2015, converts like it never learned to"
+PERFECT EXAMPLES (all 8 words or under):
+- "syncs everything. explains nothing."
+- "revolutionary. it is not."
+- "a dashboard for revenue you can't find."
+- "knows your money. doesn't know its pitch."
+- "three animations. zero explanations."
+- "undefined: what this actually does."
+- "social proof: null."
+- "ships. barely."
+- "the CTA and the value prop never met."
+- "sells clarity. delivers a screenshot and hope."
+- "boldly unclear about literally everything."
 
 RULES for roast:
-- MUST reference this specific product — use domain name or product category
-- Reads like a caption, not a punchline
-- Slightly poetic, slightly devastating
-- Exposes a REAL contradiction you can see on the page
-- Max 15 words
+- MAX 8 WORDS. Hard limit. Never more. Count the words after writing — if over 8, cut it down.
+- One complete destruction. No setup. No explanation.
+- MUST reference something specific to this exact page — domain name, product category, what they claim
+- Reads like a caption that ends a career
 
 ## STYLE 2: "stderr" field — GOLDFISH REAL TALK
 Two sentences of brutally funny real talk using relatable characters.
@@ -72,7 +74,7 @@ Median score should be 25-40. Be harsh.
 Return ONLY valid JSON, no markdown, no backticks:
 {
   "score": integer 0-100,
-  "roast": "poetic devastating observation max 15 words — specific to THIS page",
+  "roast": "max 8 words. one destruction. specific to THIS page.",
   "stderr": "two sentences. **double asterisks** around 2-3 key phrases. relatable characters.",
   "tags": [
     {"label": "3-5 words", "type": "err"},
