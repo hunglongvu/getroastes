@@ -108,9 +108,14 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    const tweetText = encodeURIComponent(
-      `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n"${data.roast}"\n\ngetroasted.wtf 🔥`
-    );
+    const header = `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n`;
+    const footer = `\n\ngetroasted.wtf 🔥`;
+    const maxRoast = 277 - header.length - footer.length;
+    let roastLine = data.roast;
+    if (roastLine.length > maxRoast) {
+      roastLine = roastLine.slice(0, maxRoast).replace(/\s+\S*$/, '');
+    }
+    const tweetText = encodeURIComponent(`${header}${roastLine}${footer}`);
     const url = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
     try {
