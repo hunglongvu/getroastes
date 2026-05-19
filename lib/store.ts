@@ -46,16 +46,29 @@ export async function getRoast(id: string): Promise<RoastResult | null> {
 }
 
 export async function getHallOfShame(limit = 20): Promise<RoastResult[]> {
+  // Fetch ordered by domain + created_at so first roast per domain comes first
   const { data } = await supabase
     .from('roasts')
     .select('*')
     .eq('excluded', false)
-    .order('score', { ascending: true })
-    .limit(limit);
+    .order('domain', { ascending: true })
+    .order('created_at', { ascending: true })
+    .limit(500);
 
   if (!data) return [];
 
-  return data.map((d) => ({
+  // DISTINCT ON domain — keep only the first (earliest) roast per domain
+  const seen = new Set<string>();
+  const unique = data.filter((d) => {
+    if (seen.has(d.domain)) return false;
+    seen.add(d.domain);
+    return true;
+  });
+
+  // Sort by score ASC (worst scores first) and take top N
+  unique.sort((a, b) => a.score - b.score);
+
+  return unique.slice(0, limit).map((d) => ({
     id: d.id,
     domain: d.domain,
     url: d.url,

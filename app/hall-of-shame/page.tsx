@@ -10,14 +10,6 @@ function scoreColor(score: number): string {
   return '#639922';
 }
 
-function exitCode(score: number): string {
-  if (score <= 15) return 'SEGFAULT: NO_VALUE_PROP';
-  if (score <= 30) return 'exit code: COOKED';
-  if (score <= 50) return 'WARNING: NEEDS_REFACTOR';
-  if (score <= 70) return 'status: ships but barely';
-  if (score <= 85) return 'build: passing';
-  return 'merge approved';
-}
 
 export default async function HallOfShamePage() {
   const roasts = await getHallOfShame(20);
@@ -65,7 +57,6 @@ export default async function HallOfShamePage() {
             {roasts.map((roast, i) => {
               const rarityStyle = RARITY_STYLES[roast.rarity];
               const color = scoreColor(roast.score);
-              const code = exitCode(roast.score);
               return (
                 <Link
                   key={roast.id}
@@ -104,9 +95,6 @@ export default async function HallOfShamePage() {
                     </div>
                     <p className="text-zinc-500 text-xs font-sans truncate">
                       &ldquo;{roast.roast}&rdquo;
-                    </p>
-                    <p className="text-zinc-700 text-[10px] font-mono mt-0.5">
-                      {code}
                     </p>
                   </div>
 
