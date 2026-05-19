@@ -27,11 +27,8 @@ function exitCode(score: number): string {
   return 'merge approved';
 }
 
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return 'http://localhost:3000';
-}
+const PAD = 56;
+const W = 800;
 
 export async function GET(
   _req: Request,
@@ -41,66 +38,95 @@ export async function GET(
   const roast = await getRoast(id);
   if (!roast) return new Response('Not found', { status: 404 });
 
-  const baseUrl = getBaseUrl();
   const rColor = rarityColor(roast.rarity);
   const sColor = scoreColor(roast.score);
   const code = exitCode(roast.score);
-  const catUrl = `${baseUrl}/cats/${roast.rarity.toLowerCase()}.jpg`;
+  const screenshotSrc = roast.screenshotBase64
+    ? `data:image/jpeg;base64,${roast.screenshotBase64}`
+    : null;
 
   return new ImageResponse(
     (
       <div
         style={{
           background: '#080808',
-          width: '800px',
+          width: `${W}px`,
           display: 'flex',
           flexDirection: 'column',
-          padding: '56px',
+          padding: `${PAD}px`,
           color: '#e5e5e5',
         }}
       >
-        {/* RARITY BADGE */}
-        <div style={{ display: 'flex', color: rColor, fontSize: 14, marginBottom: 24 }}>
-          ▲ {roast.rarity} · {roast.characterDescription}
+        {/* TOP ROW */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 4, background: rColor, display: 'flex' }} />
+            <span style={{ color: rColor, fontSize: 13 }}>
+              {roast.rarity} · {roast.characterName} {roast.characterEmoji}
+            </span>
+          </div>
+          <span style={{ color: '#555', fontSize: 13 }}>{roast.domain}</span>
         </div>
 
-        {/* CAT IMAGE */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={catUrl}
-          width={160}
-          height={160}
-          alt={roast.characterName}
-          style={{ borderRadius: 12, border: `3px solid ${rColor}`, marginBottom: 12, objectFit: 'cover' }}
-        />
-
-        {/* CHARACTER NAME */}
-        <div style={{ fontSize: 13, color: rColor, marginBottom: 32, display: 'flex' }}>
-          {roast.characterName} {roast.characterEmoji}
-        </div>
-
-        {/* DIVIDER */}
-        <div style={{ width: '100%', height: 1, background: '#1e1e1e', marginBottom: 32, display: 'flex' }} />
+        {/* SCREENSHOT */}
+        {screenshotSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={screenshotSrc}
+            alt={roast.domain}
+            width={W - PAD * 2}
+            height={220}
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'top',
+              borderRadius: 8,
+              border: '1px solid #1e1e1e',
+              marginBottom: 28,
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: W - PAD * 2,
+              height: 220,
+              background: '#111',
+              borderRadius: 8,
+              border: '1px solid #1e1e1e',
+              marginBottom: 28,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ color: '#333', fontSize: 12 }}>no screenshot</span>
+          </div>
+        )}
 
         {/* SCORE */}
-        <div style={{ fontSize: 160, fontWeight: 900, letterSpacing: -6, lineHeight: 1, color: sColor, display: 'flex' }}>
+        <div style={{ fontSize: 120, fontWeight: 900, letterSpacing: -5, lineHeight: 1, color: sColor, display: 'flex' }}>
           {roast.score}
         </div>
-        <div style={{ fontSize: 13, letterSpacing: '0.15em', color: '#555', marginBottom: 40, display: 'flex' }}>
+
+        {/* EXIT CODE */}
+        <div style={{ fontSize: 12, letterSpacing: '0.15em', color: '#444', marginTop: 6, marginBottom: 24, display: 'flex' }}>
           {code.toUpperCase()}
         </div>
 
+        {/* DIVIDER */}
+        <div style={{ width: '100%', height: 1, background: '#1a1a1a', marginBottom: 24, display: 'flex' }} />
+
         {/* ROAST QUOTE */}
-        <div style={{ fontSize: 26, lineHeight: 1.4, color: '#e5e5e5', display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 22, lineHeight: 1.45, color: '#e5e5e5', display: 'flex', flexWrap: 'wrap' }}>
           &ldquo;{roast.roast}&rdquo;
         </div>
 
-        {/* BRAND */}
-        <div style={{ marginTop: 40, fontSize: 12, color: '#333', display: 'flex' }}>
-          getroasted.wtf
+        {/* BOTTOM BAR */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 36 }}>
+          <span style={{ color: '#333', fontSize: 12 }}>getroasted.wtf</span>
+          <span style={{ color: rColor, fontSize: 12 }}>{roast.rarity}</span>
         </div>
       </div>
     ),
-    { width: 800 },
+    { width: W },
   );
 }
