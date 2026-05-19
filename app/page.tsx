@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
-import { FloatingRoasts } from './components/FloatingRoasts';
 import { getHallOfShame } from '@/lib/store';
 import { RARITY_STYLES } from '@/lib/rarity';
 
@@ -69,8 +68,6 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen bg-black text-white">
-      <FloatingRoasts />
-
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
