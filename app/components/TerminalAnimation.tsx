@@ -135,13 +135,18 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
     <div
       style={{
         position: 'fixed',
-        inset: 0,
-        zIndex: 50,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0,0,0,0.95)',
+        backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(0,0,0,0.95)',
-        backdropFilter: 'blur(5px)',
+        zIndex: 9999,
         transition: 'opacity 0.15s',
         opacity: visible ? 1 : 0,
       }}
@@ -150,11 +155,12 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
       <div
         style={{
           width: 'min(640px, 92vw)',
-          backgroundColor: '#0d0d0d',
-          borderRadius: 10,
+          background: '#0d0d0d',
+          borderRadius: '10px',
           border: '1px solid #2a2a2a',
-          boxShadow: '0 30px 100px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05)',
+          boxShadow: '0 30px 100px rgba(0,0,0,0.9)',
           overflow: 'hidden',
+          position: 'relative',
         }}
       >
         {/* Title bar */}
