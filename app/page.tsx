@@ -75,25 +75,27 @@ export default async function HomePage() {
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
-          <span className="text-white">First the AI <span className="fire-text">roasts</span> you.</span>
+          <span className="text-white fade-in">First the AI <span className="fire-text">roasts</span> you.</span>
           <br />
-          <span className="text-[#E24B4A]">Then the internet does.</span>
+          <span className="text-[#E24B4A] fade-in-delay-1">Then the internet does.</span>
         </h1>
 
-        <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 whitespace-nowrap">
+        <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 whitespace-nowrap fade-in-delay-2">
           Paste URL. Get roasted. Share on X. Go viral.
         </p>
 
-        <RoastForm />
+        <div className="fade-in-delay-3 w-full flex justify-center">
+          <RoastForm />
+        </div>
 
-        <p className="mt-5 text-zinc-600 text-xs font-mono">
+        <p className="mt-5 text-zinc-600 text-xs font-mono fade-in-delay-4">
           3 free roasts/day · no signup · no mercy
         </p>
         <RoastCounter />
       </section>
 
       {/* 2 · Hall of Shame preview */}
-      <section className="relative z-10 border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full">
+      <section className="relative z-10 border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full fade-in-delay-4">
         <div className="text-center mb-5">
           <p className="font-mono font-bold text-lg" style={{ color: '#FFB800' }}>
             🏆 Hall of Shame
