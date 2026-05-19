@@ -169,21 +169,21 @@ export function RoastCard({ data }: { data: RoastResult }) {
           {/* 4 · Exit code */}
           <div
             className="font-mono uppercase text-center"
-            style={{ fontSize: 13, letterSpacing: '0.2em', color, marginBottom: 32 }}
+            style={{ fontSize: 12, letterSpacing: '0.2em', color, marginBottom: 0 }}
           >
             {code}
           </div>
 
           {/* 5 · Roast quote */}
-          <div className="text-center" style={{ marginBottom: 24 }}>
+          <div className="text-center" style={{ marginTop: 24, marginBottom: 24 }}>
             <p
-              className="font-sans italic"
+              className="font-sans"
               style={{
-                fontSize: 20,
-                fontWeight: 500,
-                lineHeight: 1.5,
+                fontSize: 28,
+                fontWeight: 700,
+                lineHeight: 1.35,
                 color: '#ffffff',
-                maxWidth: '85%',
+                maxWidth: '95%',
                 margin: '0 auto',
               }}
             >
