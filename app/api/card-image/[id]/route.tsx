@@ -18,14 +18,6 @@ function scoreColor(score: number): string {
   return '#639922';
 }
 
-function exitCode(score: number): string {
-  if (score <= 15) return 'SEGFAULT: NO_VALUE_PROP';
-  if (score <= 30) return 'exit code: COOKED';
-  if (score <= 50) return 'WARNING: NEEDS_REFACTOR';
-  if (score <= 70) return 'status: ships but barely';
-  if (score <= 85) return 'build: passing';
-  return 'merge approved';
-}
 
 const PAD = 56;
 const W = 800;
@@ -40,7 +32,6 @@ export async function GET(
 
   const rColor = rarityColor(roast.rarity);
   const sColor = scoreColor(roast.score);
-  const code = exitCode(roast.score);
   const screenshotSrc = roast.screenshotBase64
     ? `data:image/jpeg;base64,${roast.screenshotBase64}`
     : null;
@@ -105,11 +96,6 @@ export async function GET(
         {/* SCORE */}
         <div style={{ fontSize: 120, fontWeight: 900, letterSpacing: -5, lineHeight: 1, color: sColor, display: 'flex' }}>
           {roast.score}
-        </div>
-
-        {/* EXIT CODE */}
-        <div style={{ fontSize: 12, letterSpacing: '0.15em', color: '#444', marginTop: 6, marginBottom: 24, display: 'flex' }}>
-          {code.toUpperCase()}
         </div>
 
         {/* DIVIDER */}
