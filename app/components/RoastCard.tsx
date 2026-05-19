@@ -49,9 +49,9 @@ export function RoastCard({ data }: { data: RoastResult }) {
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    const cleanStderr = data.stderr.replace(/\*\*(.*?)\*\*/g, '$1').slice(0, 120);
+    const shortRoast = data.roast.length > 80 ? data.roast.slice(0, 77) + '...' : data.roast;
     const tweetText = encodeURIComponent(
-      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${data.roast}"\n\nreal talk: ${cleanStderr}\n\n📎 attach the pic!\n\ngetroasted.wtf`
+      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${shortRoast}"\n\n📎 attach pic for full roast\n\ngetroasted.wtf`
     );
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
@@ -112,19 +112,23 @@ export function RoastCard({ data }: { data: RoastResult }) {
           {/* 1 · Rarity badge */}
           <div
             style={{
-              backgroundColor: hexToRgba(borderColor, 0.15),
-              border: `1px solid ${borderColor}`,
+              backgroundColor: hexToRgba(borderColor, 0.2),
+              border: `1.5px solid ${borderColor}`,
               borderRadius: 8,
-              padding: '10px 16px',
+              padding: '14px 18px',
               marginBottom: 24,
+              width: '100%',
             }}
           >
-            <p className="font-mono font-medium" style={{ fontSize: 14, color: borderColor }}>
-              ✦ {data.rarity} · {data.characterName} {data.characterEmoji}
+            <p className="font-mono font-bold" style={{ fontSize: 18, color: borderColor }}>
+              ✦ {data.rarity}
+            </p>
+            <p className="font-mono" style={{ fontSize: 15, color: borderColor, marginTop: 2 }}>
+              {data.characterName} {data.characterEmoji}
             </p>
             <p
               className="font-sans italic"
-              style={{ fontSize: 12, color: borderColor, opacity: 0.7, marginTop: 4 }}
+              style={{ fontSize: 12, color: borderColor, opacity: 0.7, marginTop: 6 }}
             >
               &ldquo;{data.characterDescription}&rdquo;
             </p>
