@@ -80,19 +80,22 @@ export default async function RoastPage({
             {/* 1 · Rarity badge */}
             <div
               style={{
-                backgroundColor: hexToRgba(borderColor, 0.15),
-                border: `1.5px solid ${borderColor}`,
+                backgroundColor: hexToRgba(borderColor, 0.18),
+                border: `2px solid ${borderColor}`,
                 borderRadius: 10,
-                padding: '14px 20px',
+                padding: '18px 22px',
                 marginBottom: 32,
               }}
             >
-              <p className="font-mono font-medium" style={{ fontSize: 16, color: borderColor }}>
-                ✦ {roast.rarity} · {roast.characterName} {roast.characterEmoji}
+              <p className="font-mono font-bold" style={{ fontSize: 20, color: borderColor }}>
+                ✦ {roast.rarity}
+              </p>
+              <p className="font-sans font-semibold" style={{ fontSize: 18, color: borderColor, opacity: 0.9, marginTop: 4 }}>
+                {roast.characterName} {roast.characterEmoji}
               </p>
               <p
                 className="font-sans italic"
-                style={{ fontSize: 13, color: borderColor, opacity: 0.6, marginTop: 4 }}
+                style={{ fontSize: 14, color: borderColor, opacity: 0.65, marginTop: 6 }}
               >
                 &ldquo;{roast.characterDescription}&rdquo;
               </p>
@@ -149,15 +152,15 @@ export default async function RoastPage({
             <div
               style={{
                 backgroundColor: '#0d0d0d',
-                border: '1px solid #1e1e1e',
+                border: '1px solid #2a2a2a',
                 borderRadius: 10,
-                padding: '20px 24px',
+                padding: '24px 28px',
               }}
             >
-              <p className="font-mono" style={{ fontSize: 11, color: '#E24B4A', marginBottom: 8 }}>
+              <p className="font-mono font-medium" style={{ fontSize: 13, color: '#E24B4A', marginBottom: 10 }}>
                 // real talk
               </p>
-              <p style={{ fontSize: 14, color: '#777', lineHeight: 1.7 }}>
+              <p style={{ fontSize: 16, color: '#999', lineHeight: 1.75 }}>
                 {roast.stderr.replace(/\*\*/g, '')}
               </p>
             </div>
