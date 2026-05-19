@@ -133,9 +133,14 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background: 'rgba(0,0,0,0.88)',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0,0,0,0.95)',
         backdropFilter: 'blur(5px)',
         transition: 'opacity 0.15s',
         opacity: visible ? 1 : 0,
