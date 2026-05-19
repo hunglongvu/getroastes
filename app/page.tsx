@@ -2,26 +2,16 @@ import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
 import { Embers } from './components/Embers';
 import { RoastCounter } from './components/RoastCounter';
-import { getRecentRoasts } from '@/lib/store';
+import { getHallOfShame } from '@/lib/store';
 
-function survivalColor(score: number): string {
-  if (score <= 20) return '#ff4444';
-  if (score <= 40) return '#ff8c00';
-  if (score <= 60) return '#eab308';
-  if (score <= 80) return '#3b82f6';
-  return '#22c55e';
-}
-
-function diagnosis(score: number): string {
-  if (score <= 20) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
-  if (score <= 40) return 'THE WAITLIST WAS JUST FRIENDS';
-  if (score <= 60) return 'BUILT FOR A MARKET OF ONE (YOU)';
-  if (score <= 80) return 'YOUR MOM IS YOUR ONLY USER';
-  return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
+function scoreColor(score: number): string {
+  if (score <= 40) return '#E24B4A';
+  if (score <= 70) return '#EF9F27';
+  return '#639922';
 }
 
 export default async function HomePage() {
-  const recentRoasts = await getRecentRoasts(5);
+  const topShame = await getHallOfShame(5);
 
   return (
     <main className="relative min-h-screen bg-black text-white">
@@ -49,54 +39,64 @@ export default async function HomePage() {
         <RoastCounter />
       </section>
 
-      {/* 2 · Recent victims */}
+      {/* 2 · Hall of Shame preview */}
       <section className="relative z-10 border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full fade-in-delay-4">
         <div className="mb-6">
-          <p className="font-mono font-bold text-sm" style={{ color: '#E24B4A' }}>
-            // hall of shame — recent victims
+          <p className="font-mono font-bold text-sm" style={{ color: '#FFB800' }}>
+            🏆 Hall of Shame
           </p>
           <p className="text-zinc-600 font-mono text-xs mt-1">
-            real startups. real pain.
+            the worst landing pages the internet has to offer
           </p>
         </div>
 
-        {recentRoasts.length === 0 ? (
+        {topShame.length === 0 ? (
           <p className="text-zinc-600 font-mono text-xs py-6">
             // no victims yet. be the first.
           </p>
         ) : (
-          <div className="flex flex-col gap-3">
-            {recentRoasts.map((roast) => {
-              const color = survivalColor(roast.score);
-              const diag = diagnosis(roast.score);
+          <div className="flex flex-col gap-2">
+            {topShame.map((roast, i) => {
+              const color = scoreColor(roast.score);
               return (
                 <Link
                   key={roast.id}
                   href={`/roast/${roast.id}`}
-                  className="block rounded-lg px-5 py-4 hover:opacity-80 transition-opacity"
+                  className="shame-row flex items-center gap-4 rounded-lg p-4 transition-colors"
                   style={{
                     backgroundColor: '#0d0d0d',
                     border: '1px solid #1a1a1a',
-                    borderLeft: `3px solid ${color}`,
+                    ['--score-color' as string]: color,
                   }}
                 >
-                  <div className="flex items-center justify-between gap-4 mb-1">
-                    <span className="font-mono text-sm truncate" style={{ color: '#888' }}>
-                      {roast.domain}
-                    </span>
-                    <span className="font-mono font-bold text-lg flex-none" style={{ color }}>
-                      {roast.score}%
-                    </span>
-                  </div>
+                  {/* Rank */}
                   <div
-                    className="font-mono mb-2"
-                    style={{ fontSize: 11, color: '#444', letterSpacing: '0.15em' }}
+                    className="font-mono text-sm w-6 flex-none text-right"
+                    style={{ color: '#444' }}
                   >
-                    {diag}
+                    #{i + 1}
                   </div>
-                  <p className="font-sans text-sm italic" style={{ color: '#e5e5e5' }}>
-                    &ldquo;{roast.roast}&rdquo;
-                  </p>
+
+                  {/* Score */}
+                  <div
+                    className="font-mono text-2xl font-bold flex-none w-12 text-center leading-none"
+                    style={{ color }}
+                  >
+                    {roast.score}
+                  </div>
+
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-mono text-sm mb-0.5" style={{ color: '#e5e5e5' }}>
+                      {roast.domain}
+                    </div>
+                    <p className="text-xs italic truncate" style={{ color: '#666' }}>
+                      &ldquo;{roast.roast}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Arrow */}
+                  <div className="font-mono text-xs flex-none" style={{ color: '#333' }}>→</div>
                 </Link>
               );
             })}
