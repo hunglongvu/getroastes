@@ -89,7 +89,7 @@ export default async function RoastPage({
           {/* LEFT COLUMN — meme card */}
           <div className="flex-1 flex justify-center md:justify-start">
             <div className="w-full max-w-[400px] md:max-w-none">
-              <RoastCard data={roast} />
+              <RoastCard data={roast} rank={rank} />
             </div>
           </div>
 

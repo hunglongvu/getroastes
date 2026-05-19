@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
-import type { RoastResult } from '@/lib/types';
+import type { RoastResult, Tag } from '@/lib/types';
 import type { Rarity } from '@/lib/rarity';
 import { RARITY_STYLES } from '@/lib/rarity';
 
@@ -36,7 +36,16 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-export function RoastCard({ data }: { data: RoastResult }) {
+function getStatFromTags(tags: Tag[], keyword: string, seed: number): number {
+  const tag = tags.find(t => t.label.toLowerCase().includes(keyword));
+  const pseudo = ((seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  if (!tag) return 35 + pseudo * 15;
+  if (tag.type === 'err') return 10 + pseudo * 20;
+  if (tag.type === 'warn') return 30 + pseudo * 25;
+  return 60 + pseudo * 25;
+}
+
+export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) {
   const [imgError, setImgError] = useState(false);
   const [buttonState, setButtonState] = useState<'default' | 'capturing' | 'done'>('default');
 
@@ -44,7 +53,13 @@ export function RoastCard({ data }: { data: RoastResult }) {
   const code = exitCode(data.score);
   const rarityStyle = RARITY_STYLES[data.rarity];
   const borderColor = rarityStyle.border;
-  const shortRoast = data.roast.length > 60 ? data.roast.slice(0, 57) + '...' : data.roast;
+
+  const stats = useMemo(() => ({
+    score: data.score,
+    cta: getStatFromTags(data.tags, 'cta', data.score * 7),
+    copy: getStatFromTags(data.tags, 'copy', data.score * 13),
+    proof: getStatFromTags(data.tags, 'proof', data.score * 17),
+  }), [data.tags, data.score]);
 
   async function handleShareAndDownload() {
     if (buttonState !== 'default') return;
@@ -80,57 +95,102 @@ export function RoastCard({ data }: { data: RoastResult }) {
     }
   }
 
+  const rarityClass = `pokemon-card pokemon-card-${data.rarity.toLowerCase()}`;
+
   return (
     <div className="w-full">
-      {/* 1:1 meme card */}
+      {/* Pokemon-style card */}
       <div
-        className="relative overflow-hidden"
+        className={rarityClass}
         style={{
-          aspectRatio: '1 / 1',
           backgroundColor: '#080808',
-          border: `1px solid ${hexToRgba(borderColor, 0.4)}`,
           borderRadius: 16,
-          boxShadow: `0 0 40px ${hexToRgba(borderColor, 0.1)}`,
-          padding: 24,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          border: `2px solid ${borderColor}`,
+          boxShadow: `0 0 30px ${hexToRgba(borderColor, 0.2)}, 0 0 60px ${hexToRgba(borderColor, 0.1)}`,
         }}
       >
-        {/* Watermark */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
-          <span
-            className="font-mono font-bold whitespace-nowrap select-none text-white"
-            style={{
-              fontSize: '2rem',
-              opacity: 0.015,
-              transform: 'rotate(-30deg) scaleX(1.6)',
-              letterSpacing: '0.08em',
-            }}
-          >
-            getroasted.wtf &nbsp; getroasted.wtf &nbsp; getroasted.wtf
-          </span>
+        {/* HEADER BAR */}
+        <div style={{
+          backgroundColor: hexToRgba(borderColor, 0.2),
+          borderBottom: `1px solid ${hexToRgba(borderColor, 0.4)}`,
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '10px 16px 4px',
+          }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#fff', fontWeight: 600 }}>
+              {data.domain}
+            </span>
+            {rank != null && (
+              <span style={{ fontFamily: 'monospace', fontSize: 12, color: borderColor }}>
+                #{rank} Hall of Shame
+              </span>
+            )}
+          </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 16px 10px',
+          }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: borderColor }}>
+              ⬡ {data.rarity}
+            </span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: borderColor }}>
+              {data.characterEmoji} {data.characterName}
+            </span>
+          </div>
         </div>
 
-        {/* Rarity + character */}
-        <div className="relative text-center w-full">
-          <p className="font-mono" style={{ fontSize: 12, color: borderColor }}>
-            ✦ {data.rarity}
-          </p>
-          <p className="font-mono" style={{ fontSize: 13, color: borderColor }}>
-            {data.characterName} {data.characterEmoji}
-          </p>
+        {/* SCREENSHOT BANNER */}
+        <div style={{
+          width: '100%',
+          height: 180,
+          position: 'relative',
+          borderTop: `1px solid ${hexToRgba(borderColor, 0.3)}`,
+          borderBottom: `1px solid ${hexToRgba(borderColor, 0.3)}`,
+          overflow: 'hidden',
+          backgroundColor: '#0d0d0d',
+        }}>
+          {data.screenshotBase64 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`data:image/jpeg;base64,${data.screenshotBase64}`}
+              alt={data.domain}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+            />
+          ) : (
+            <div style={{
+              width: '100%', height: '100%',
+              background: `linear-gradient(180deg, ${hexToRgba(borderColor, 0.05)} 0%, transparent 100%)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#333' }}>no screenshot</span>
+            </div>
+          )}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '30%',
+            background: `linear-gradient(0deg, ${hexToRgba(borderColor, 0.25)} 0%, transparent 100%)`,
+            pointerEvents: 'none',
+          }} />
         </div>
 
-        {/* Cat image */}
-        <div className="relative flex justify-center">
+        {/* CHARACTER ROW */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '12px 16px',
+          backgroundColor: hexToRgba(borderColor, 0.08),
+        }}>
           {!imgError ? (
             <Image
               src={CAT_IMAGES[data.rarity]}
               alt={data.characterName}
-              width={100}
-              height={100}
+              width={56}
+              height={56}
               unoptimized
               crossOrigin="anonymous"
               onError={() => setImgError(true)}
@@ -138,41 +198,76 @@ export function RoastCard({ data }: { data: RoastResult }) {
                 borderRadius: 8,
                 border: `2px solid ${borderColor}`,
                 objectFit: 'cover',
+                flexShrink: 0,
               }}
             />
           ) : (
-            <div style={{ width: 100, height: 100 }} />
+            <div style={{ width: 56, height: 56, borderRadius: 8, backgroundColor: '#1a1a1a', flexShrink: 0 }} />
           )}
-        </div>
-
-        {/* Score */}
-        <div className="relative text-center">
-          <div
-            className="font-mono leading-none"
-            style={{ fontSize: 96, fontWeight: 900, color, letterSpacing: -4, lineHeight: 1 }}
-          >
-            {data.score}
-          </div>
-          <div
-            className="font-mono uppercase"
-            style={{ fontSize: 10, letterSpacing: '0.2em', color, marginTop: 4 }}
-          >
-            {code}
+          <div>
+            <div style={{ fontFamily: 'sans-serif', fontSize: 14, fontWeight: 600, color: borderColor }}>
+              {data.characterName}
+            </div>
+            <div style={{ fontFamily: 'sans-serif', fontSize: 11, fontStyle: 'italic', color: borderColor, opacity: 0.6, marginTop: 2, lineHeight: 1.4 }}>
+              &ldquo;{data.characterDescription}&rdquo;
+            </div>
           </div>
         </div>
 
-        {/* Roast quote */}
-        <div className="relative text-center" style={{ padding: '0 8px' }}>
-          <p className="font-sans italic" style={{ fontSize: 14, color: '#ffffff', lineHeight: 1.4 }}>
-            &ldquo;{shortRoast}&rdquo;
+        {/* STATS SECTION */}
+        <div style={{ padding: '14px 16px', borderTop: '1px solid #1a1a1a' }}>
+          <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#555', letterSpacing: '0.15em', marginBottom: 10 }}>
+            DAMAGE REPORT
+          </div>
+          {[
+            { label: 'SCORE', value: `${data.score}/100`, fill: stats.score / 100 },
+            { label: 'CTA', value: stats.cta < 25 ? 'weak' : stats.cta < 55 ? 'meh' : 'ok', fill: stats.cta / 100 },
+            { label: 'COPY', value: stats.copy < 25 ? 'vague' : stats.copy < 55 ? 'generic' : 'clear', fill: stats.copy / 100 },
+            { label: 'PROOF', value: stats.proof < 25 ? 'none' : stats.proof < 55 ? 'weak' : 'solid', fill: stats.proof / 100 },
+          ].map(({ label, value, fill }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#555', width: 48, flexShrink: 0 }}>{label}</span>
+              <div style={{ flex: 1, height: 4, backgroundColor: '#1a1a1a', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ width: `${Math.round(fill * 100)}%`, height: '100%', backgroundColor: color, borderRadius: 2 }} />
+              </div>
+              <span style={{ fontFamily: 'monospace', fontSize: 10, color, width: 56, textAlign: 'right', flexShrink: 0 }}>{value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* EXIT CODE BAR */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '8px 16px',
+          backgroundColor: hexToRgba(borderColor, 0.12),
+          borderTop: `1px solid ${hexToRgba(borderColor, 0.2)}`,
+          borderBottom: `1px solid ${hexToRgba(borderColor, 0.2)}`,
+        }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 11, color: borderColor }}>
+            ⚡ {code}
+          </span>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
+        </div>
+
+        {/* ROAST SECTION */}
+        <div style={{ padding: '14px 16px' }}>
+          <p style={{ fontSize: 16, fontWeight: 700, color: '#ffffff', lineHeight: 1.4, margin: '0 0 10px' }}>
+            &ldquo;{data.roast}&rdquo;
+          </p>
+          <div style={{ borderTop: '1px solid #1a1a1a', marginBottom: 10 }} />
+          <p style={{ fontFamily: 'monospace', fontSize: 10, color: '#E24B4A', marginBottom: 6 }}>
+            // real talk
+          </p>
+          <p style={{ fontSize: 12, color: '#666', lineHeight: 1.6, margin: 0 }}>
+            {data.stderr.replace(/\*\*/g, '')}
           </p>
         </div>
 
-        {/* Footer */}
-        <div className="relative text-center">
-          <span className="font-mono" style={{ fontSize: 10, color: '#333' }}>
-            getroasted.wtf
-          </span>
+        {/* FOOTER */}
+        <div style={{ padding: '8px', borderTop: '1px solid #1a1a1a', textAlign: 'center' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#222' }}>getroasted.wtf</span>
         </div>
       </div>
 
@@ -207,7 +302,6 @@ export function RoastCard({ data }: { data: RoastResult }) {
             : 'share on X 𝕏 + download card'}
       </button>
 
-      {/* Helper text */}
       <p className="font-mono text-xs text-zinc-600 text-center" style={{ marginTop: 8 }}>
         // card downloads automatically · attach to tweet
       </p>

@@ -69,3 +69,40 @@ body {
   opacity: 0;
   animation: fade-in 0.7s ease-out 0.6s forwards;
 }
+
+.pokemon-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.pokemon-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 40%,
+    rgba(255,255,255,0.03) 50%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pokemon-card-mythic::before {
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(217,70,239,0.06) 50%,
+    transparent 70%
+  );
+}
+
+.pokemon-card-legendary::before {
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255,184,0,0.06) 50%,
+    transparent 70%
+  );
+}
