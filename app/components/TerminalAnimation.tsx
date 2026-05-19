@@ -134,8 +134,18 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-black flex items-center justify-center"
-      style={{ zIndex: 99999, opacity: visible ? 1 : 0, transition: 'opacity 0.15s' }}
+      className="fixed inset-0"
+      style={{
+        zIndex: 99999,
+        background: '#000',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.15s',
+      }}
     >
       {/* Burning domain */}
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
