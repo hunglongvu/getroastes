@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { RoastResult } from '@/lib/types';
 import type { Rarity } from '@/lib/rarity';
@@ -29,28 +29,7 @@ function exitCode(score: number): string {
   return 'merge approved';
 }
 
-
-function parseStderr(text: string): React.ReactNode {
-  const parts = text.split(/\*\*(.*?)\*\*/g);
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <span key={i} className="text-[#E24B4A] font-semibold">
-        {part}
-      </span>
-    ) : (
-      <span key={i}>{part}</span>
-    )
-  );
-}
-
-// Pure display component — can be rendered with or without a ref
-function CardDisplay({
-  data,
-  innerRef,
-}: {
-  data: RoastResult;
-  innerRef?: React.RefObject<HTMLDivElement | null>;
-}) {
+function CardDisplay({ data }: { data: RoastResult }) {
   const [imgError, setImgError] = useState(false);
   const color = scoreColor(data.score);
   const code = exitCode(data.score);
@@ -58,27 +37,22 @@ function CardDisplay({
 
   return (
     <div
-      ref={innerRef}
-      id={innerRef ? 'roast-card' : undefined}
-      className="relative w-full rounded-lg overflow-hidden"
+      className="relative w-full overflow-hidden"
       style={{
+        aspectRatio: '1 / 1',
         backgroundColor: '#080808',
         border: `1px solid ${rarityStyle.border}`,
         boxShadow: rarityStyle.glow,
+        borderRadius: 12,
       }}
     >
-      {/* Rarity background tint */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{ backgroundColor: rarityStyle.bg }}
-      />
-
-      {/* Diagonal watermark */}
-      <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center overflow-hidden">
+      {/* Subtle diagonal watermark */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
         <span
-          className="text-white font-mono font-bold text-5xl whitespace-nowrap select-none"
+          className="text-white font-mono font-bold whitespace-nowrap select-none"
           style={{
-            opacity: 0.035,
+            fontSize: '3rem',
+            opacity: 0.025,
             transform: 'rotate(-30deg) scaleX(1.6)',
             letterSpacing: '0.08em',
           }}
@@ -87,138 +61,79 @@ function CardDisplay({
         </span>
       </div>
 
-      {/* Main content */}
-      <div className="relative z-20 p-6 sm:p-8">
-        {/* Rarity badge */}
-        <div className={`font-mono mb-1 ${rarityStyle.badge}`}>
-          <span className="text-sm font-bold tracking-wider">
-            ✦ {data.rarity}
-          </span>
-          <span className="text-sm mx-2 opacity-50">·</span>
-          <span className="text-sm">
-            {data.characterName} {data.characterEmoji}
-          </span>
+      {/* Content — 5 sections distributed vertically */}
+      <div
+        className="relative flex flex-col"
+        style={{ height: '100%', padding: '24px', justifyContent: 'space-between' }}
+      >
+        {/* 1 · Rarity badge */}
+        <div>
+          <p
+            className="font-mono font-bold"
+            style={{ fontSize: 13, color: rarityStyle.border }}
+          >
+            ✦ {data.rarity} · {data.characterName} {data.characterEmoji}
+          </p>
+          <p
+            className="font-sans italic"
+            style={{ fontSize: 12, color: rarityStyle.border, opacity: 0.7, marginTop: 3 }}
+          >
+            &ldquo;{data.characterDescription}&rdquo;
+          </p>
         </div>
-        <p className={`text-xs font-sans mb-5 opacity-70 ${rarityStyle.badge}`}>
-          &ldquo;{data.characterDescription}&rdquo;
-        </p>
 
-        {/* Cat image */}
+        {/* 2 · Cat image */}
         {!imgError && (
-          <div className="flex flex-col items-center mb-6">
+          <div className="flex justify-center">
             <Image
               src={CAT_IMAGES[data.rarity]}
               alt={data.characterName}
-              width={120}
-              height={120}
+              width={140}
+              height={140}
+              unoptimized
+              crossOrigin="anonymous"
               onError={() => setImgError(true)}
               style={{
-                borderRadius: 8,
+                borderRadius: 10,
                 border: `2px solid ${rarityStyle.border}`,
                 objectFit: 'cover',
               }}
-              unoptimized
-              crossOrigin="anonymous"
             />
-            <div className={`mt-2 text-xs font-mono ${rarityStyle.badge}`}>
-              {data.characterName} {data.characterEmoji}
-            </div>
-            <div
-              className={`text-xs font-sans italic opacity-60 ${rarityStyle.badge}`}
-            >
-              {data.characterDescription}
-            </div>
           </div>
         )}
 
-        {/* Screenshot */}
-        {data.screenshotBase64 && (
-          <div className="mb-6">
-            <img
-              src={`data:image/jpeg;base64,${data.screenshotBase64}`}
-              alt="screenshot of roasted page"
-              crossOrigin="anonymous"
-              style={{
-                width: '100%',
-                borderRadius: '8px',
-                border: '1px solid #1a1a1a',
-                maxHeight: '200px',
-                objectFit: 'cover',
-                objectPosition: 'top',
-              }}
-            />
-            <p className="text-zinc-600 text-xs font-mono mt-2 text-center">
-              // above: the crime scene
-            </p>
-          </div>
-        )}
-
-        {/* Title bar */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex gap-1.5">
-            <span className="block w-3 h-3 rounded-full bg-[#E24B4A]" />
-            <span className="block w-3 h-3 rounded-full bg-[#EF9F27]" />
-            <span className="block w-3 h-3 rounded-full bg-[#639922]" />
-          </div>
-          <span className="text-zinc-500 text-xs font-mono">
-            getroasted.wtf — v2.0.0
-          </span>
-        </div>
-
-        {/* Command */}
-        <div className="font-mono text-sm mb-10 text-zinc-500">
-          <span className="text-[#639922]">$</span> roast --url{' '}
-          <span className="text-zinc-300">{data.domain}</span> --no-mercy
-        </div>
-
-        {/* Score */}
-        <div className="text-center mb-2">
+        {/* 3 · Score */}
+        <div className="text-center">
           <div
-            className="text-8xl sm:text-9xl font-bold font-mono leading-none"
-            style={{ color }}
+            className="font-mono font-bold leading-none"
+            style={{ fontSize: 96, color }}
           >
             {data.score}
           </div>
           <div
-            className="mt-2 text-sm font-mono tracking-wider uppercase"
-            style={{ color }}
+            className="font-mono uppercase"
+            style={{ fontSize: 11, letterSpacing: '0.15em', color, marginTop: 6 }}
           >
             {code}
           </div>
         </div>
 
-        {/* Roast line */}
-        <div className="mt-10 mb-8 text-center px-4">
-          <p className="text-white text-xl sm:text-2xl leading-snug font-sans">
+        {/* 4 · Roast quote */}
+        <div className="text-center" style={{ padding: '0 5%' }}>
+          <p
+            className="font-sans italic"
+            style={{ fontSize: 17, color: '#ffffff', lineHeight: 1.4 }}
+          >
             &ldquo;{data.roast}&rdquo;
           </p>
         </div>
 
-        {/* STDERR box */}
-        <div
-          className="rounded border border-zinc-800 p-4 mb-8"
-          style={{ backgroundColor: '#0d0d0d' }}
-        >
-          <div className="text-[#E24B4A] text-xs font-mono mb-2">stderr:</div>
-          <p className="text-zinc-400 text-sm font-sans leading-relaxed">
-            {parseStderr(data.stderr)}
-          </p>
+        {/* 5 · Footer */}
+        <div className="text-center">
+          <span className="font-mono" style={{ fontSize: 11, color: '#333' }}>
+            getroasted.wtf
+          </span>
         </div>
-
-        {/* Footer */}
-        <div className="flex items-center">
-          <span className="text-zinc-600 text-xs font-mono">getroasted.wtf</span>
-        </div>
-      </div>
-
-      {/* Bottom watermark banner */}
-      <div
-        className="relative z-20 flex items-center justify-center py-2 border-t border-zinc-800"
-        style={{ backgroundColor: '#0a0a0a' }}
-      >
-        <span className="text-zinc-600 text-xs font-mono">
-          🔒 clean card — coming soon
-        </span>
       </div>
     </div>
   );
@@ -227,7 +142,6 @@ function CardDisplay({
 export function RoastCard({ data }: { data: RoastResult }) {
   const [fullscreen, setFullscreen] = useState(false);
   const [buttonState, setButtonState] = useState<'default' | 'capturing' | 'done'>('default');
-  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!fullscreen) return;
@@ -285,49 +199,41 @@ export function RoastCard({ data }: { data: RoastResult }) {
         </button>
       </div>
 
-      {/* Card — ref is here for html2canvas */}
-      <CardDisplay data={data} innerRef={cardRef} />
+      <CardDisplay data={data} />
 
       {/* Share button */}
-      <div className="mt-4">
-        <button
-          onClick={handleShareAndDownload}
-          disabled={buttonState !== 'default'}
-          className="w-full font-mono font-medium"
-          style={{
-            padding: '14px 20px',
-            borderRadius: 8,
-            fontSize: 15,
-            backgroundColor: '#000',
-            border: '1.5px solid #ffffff',
-            cursor: buttonState !== 'default' ? 'not-allowed' : 'pointer',
-            color:
-              buttonState === 'capturing'
-                ? '#a1a1aa'
-                : buttonState === 'done'
-                  ? '#639922'
-                  : '#ffffff',
-            transition: 'background-color 0.15s, color 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            if (buttonState === 'default')
-              e.currentTarget.style.backgroundColor = '#111';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#000';
-          }}
-        >
-          {buttonState === 'capturing'
-            ? 'capturing card...'
-            : buttonState === 'done'
-              ? '✓ card saved — opening X...'
-              : 'share on X 𝕏'}
-        </button>
-
-        <p className="font-mono text-zinc-600 text-xs text-center mt-2">
-          // downloads card + opens tweet · attach the image for maximum roast impact
-        </p>
-      </div>
+      <button
+        onClick={handleShareAndDownload}
+        disabled={buttonState !== 'default'}
+        className="w-full font-mono font-medium mt-4"
+        style={{
+          padding: '14px 20px',
+          borderRadius: 8,
+          fontSize: 15,
+          backgroundColor: '#000',
+          border: '1.5px solid #ffffff',
+          cursor: buttonState !== 'default' ? 'not-allowed' : 'pointer',
+          color:
+            buttonState === 'capturing'
+              ? '#a1a1aa'
+              : buttonState === 'done'
+                ? '#639922'
+                : '#ffffff',
+          transition: 'background-color 0.15s, color 0.15s',
+        }}
+        onMouseEnter={(e) => {
+          if (buttonState === 'default') e.currentTarget.style.backgroundColor = '#111';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#000';
+        }}
+      >
+        {buttonState === 'capturing'
+          ? 'capturing card...'
+          : buttonState === 'done'
+            ? '✓ card saved — opening X...'
+            : 'share on X 𝕏'}
+      </button>
 
       {/* Fullscreen modal */}
       {fullscreen && (
@@ -337,8 +243,7 @@ export function RoastCard({ data }: { data: RoastResult }) {
           onClick={() => setFullscreen(false)}
         >
           <div
-            className="w-full max-w-2xl overflow-y-auto"
-            style={{ maxHeight: '90vh' }}
+            className="w-full max-w-[480px]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end mb-2">
