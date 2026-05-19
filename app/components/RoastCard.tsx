@@ -80,6 +80,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     <div className="w-full" style={{ maxWidth: 340 }}>
       {/* Pokemon card */}
       <div
+        id="roast-card"
         className="pokemon-card"
         style={{
           backgroundColor: '#080808',
