@@ -58,22 +58,38 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    const tweetRoast = data.roast.length > 80 ? data.roast.slice(0, 77) + '...' : data.roast;
-    const tweetText = encodeURIComponent(
-      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${tweetRoast}"\n\n📎 attach pic for full roast\n\ngetroasted.wtf`
-    );
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+    try {
+      const response = await fetch(`/api/card-image/${data.id}`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.href = `/api/card-image/${data.id}`;
-    link.download = `roast-${data.domain}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = url;
+      link.download = `roast-${data.domain}.png`;
+      document.body.appendChild(link);
+      link.click();
 
-    setButtonState('done');
-    setTimeout(() => window.open(tweetUrl, '_blank'), 1000);
-    setTimeout(() => setButtonState('default'), 3000);
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+
+      setButtonState('done');
+    } catch (err) {
+      console.error('Download failed:', err);
+      window.open(`/api/card-image/${data.id}`, '_blank');
+      setButtonState('done');
+    }
+
+    setTimeout(() => {
+      const shortRoast = data.roast.length > 80 ? data.roast.slice(0, 77) + '...' : data.roast;
+      const tweetText = encodeURIComponent(
+        `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${shortRoast}"\n\n📎 attach pic for full roast\n\ngetroasted.wtf`
+      );
+      window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
+      setTimeout(() => setButtonState('default'), 2000);
+    }, 1500);
   }
 
   return (
@@ -216,7 +232,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
         {buttonState === 'capturing'
           ? 'capturing card...'
           : buttonState === 'done'
-            ? '✓ card saved — opening X...'
+            ? '✓ saved! opening X...'
             : 'share on X 𝕏 + download card'}
       </button>
 
