@@ -66,7 +66,7 @@ export async function getHallOfShame(limit = 20): Promise<RoastResult[]> {
   });
 
   // Sort by score ASC (worst scores first) and take top N
-  unique.sort((a, b) => a.score - b.score);
+  unique.sort((a, b) => b.score - a.score);
 
   return unique.slice(0, limit).map((d) => ({
     id: d.id,

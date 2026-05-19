@@ -12,18 +12,18 @@ function hexToRgba(hex: string, alpha: number): string {
 }
 
 function survivalColor(score: number): string {
-  if (score <= 20) return '#ff4444';
-  if (score <= 40) return '#ff8c00';
-  if (score <= 60) return '#eab308';
-  if (score <= 80) return '#3b82f6';
+  if (score >= 80) return '#ff4444';
+  if (score >= 60) return '#ff8c00';
+  if (score >= 40) return '#eab308';
+  if (score >= 20) return '#3b82f6';
   return '#22c55e';
 }
 
 function diagnosis(score: number): string {
-  if (score <= 20) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
-  if (score <= 40) return 'THE WAITLIST WAS JUST FRIENDS';
-  if (score <= 60) return 'BUILT FOR A MARKET OF ONE (YOU)';
-  if (score <= 80) return 'YOUR MOM IS YOUR ONLY USER';
+  if (score >= 80) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
+  if (score >= 60) return 'THE WAITLIST WAS JUST FRIENDS';
+  if (score >= 40) return 'BUILT FOR A MARKET OF ONE (YOU)';
+  if (score >= 20) return 'YOUR MOM IS YOUR ONLY USER';
   return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
@@ -64,12 +64,9 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     }
 
     setTimeout(() => {
-      const shortRoast = data.roast.length > 80 ? data.roast.slice(0, 77) + '...' : data.roast;
-      const cleanStderr = data.stderr.replace(/\*\*/g, '');
-      const firstSentence = (cleanStderr.split(/(?<=[.!?])\s/)[0] ?? cleanStderr).trim();
-      const stderrSnippet = firstSentence.length > 100 ? firstSentence.slice(0, 99) + '…' : firstSentence;
+      const shortRoast = data.roast.length > 100 ? data.roast.slice(0, 97) + '...' : data.roast;
       const tweetText = encodeURIComponent(
-        `just got my landing page roasted by AI 💀\n\n${data.domain} → ${data.score}/100\n"${stderrSnippet}"\n\n"${shortRoast}"\n\ngetroasted.wtf 🔥`
+        `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n"${shortRoast}"\n\ngetroasted.wtf 🔥`
       );
       window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
       setTimeout(() => setButtonState('default'), 2000);
@@ -100,7 +97,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
               <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 800, color: sColor, lineHeight: 1 }}>
                 {data.score}%
               </span>
-              <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#555' }}>survival</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#555' }}>cooked</span>
             </div>
           </div>
           <div style={{ padding: '4px 14px 8px' }}>
@@ -116,7 +113,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
             {data.score}
           </div>
           <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#444', letterSpacing: '0.2em', marginTop: 4 }}>
-            SURVIVAL RATE
+            COOKED SCORE
           </div>
         </div>
 

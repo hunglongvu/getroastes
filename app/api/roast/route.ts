@@ -66,13 +66,13 @@ rules:
 
 ---
 
-SCORING — median 25-40, be harsh:
-- 0-15: no CTA, no value prop, total mystery
-- 16-30: generic template energy, zero personality
-- 31-50: forgettable but functional
-- 51-70: you can tell what it does
-- 71-85: actually good
-- 86-100: almost never
+SCORING — 100 = fully cooked/worthless, 0 = actually good:
+- 80-100: completely cooked — no value prop, no idea what it does, looks unfinished
+- 60-79: pretty bad — generic copy, buried CTA, zero credibility
+- 40-59: mediocre — functional but forgettable
+- 20-39: decent — mostly works, clear enough
+- 0-19: actually good (almost never give this)
+typical bad SaaS page should score 70-95. lean harsh.
 
 ---
 

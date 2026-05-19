@@ -5,9 +5,11 @@ import { RARITY_STYLES } from '@/lib/rarity';
 export const revalidate = 60;
 
 function scoreColor(score: number): string {
-  if (score <= 40) return '#E24B4A';
-  if (score <= 70) return '#EF9F27';
-  return '#639922';
+  if (score >= 80) return '#ff4444';
+  if (score >= 60) return '#ff8c00';
+  if (score >= 40) return '#eab308';
+  if (score >= 20) return '#3b82f6';
+  return '#22c55e';
 }
 
 

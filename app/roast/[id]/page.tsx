@@ -7,27 +7,27 @@ import { Embers } from '@/app/components/Embers';
 import { RARITY_STYLES } from '@/lib/rarity';
 
 function survivalColor(score: number): string {
-  if (score <= 20) return '#ff4444';
-  if (score <= 40) return '#ff8c00';
-  if (score <= 60) return '#eab308';
-  if (score <= 80) return '#3b82f6';
+  if (score >= 80) return '#ff4444';
+  if (score >= 60) return '#ff8c00';
+  if (score >= 40) return '#eab308';
+  if (score >= 20) return '#3b82f6';
   return '#22c55e';
 }
 
 function exitCode(score: number): string {
-  if (score <= 15) return 'SEGFAULT: NO_VALUE_PROP';
-  if (score <= 30) return 'exit code: COOKED';
-  if (score <= 50) return 'WARNING: NEEDS_REFACTOR';
-  if (score <= 70) return 'status: ships but barely';
-  if (score <= 85) return 'build: passing';
+  if (score >= 85) return 'SEGFAULT: NO_VALUE_PROP';
+  if (score >= 70) return 'exit code: COOKED';
+  if (score >= 50) return 'WARNING: NEEDS_REFACTOR';
+  if (score >= 30) return 'status: ships but barely';
+  if (score >= 15) return 'build: passing';
   return 'merge approved';
 }
 
 function diagnosis(score: number): string {
-  if (score <= 20) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
-  if (score <= 40) return 'THE WAITLIST WAS JUST FRIENDS';
-  if (score <= 60) return 'BUILT FOR A MARKET OF ONE (YOU)';
-  if (score <= 80) return 'YOUR MOM IS YOUR ONLY USER';
+  if (score >= 80) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
+  if (score >= 60) return 'THE WAITLIST WAS JUST FRIENDS';
+  if (score >= 40) return 'BUILT FOR A MARKET OF ONE (YOU)';
+  if (score >= 20) return 'YOUR MOM IS YOUR ONLY USER';
   return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
@@ -40,13 +40,14 @@ export default async function RoastPage({
   const roast = await getRoast(id);
   if (!roast) notFound();
 
-  const [{ count: worseCount }, { count: total }] = await Promise.all([
+  const [{ count: lessCooked }, { count: total }] = await Promise.all([
     supabase.from('roasts').select('*', { count: 'exact', head: true }).lt('score', roast.score),
     supabase.from('roasts').select('*', { count: 'exact', head: true }),
   ]);
 
-  const rank = (total ?? 0) - (worseCount ?? 0);
-  const percentileCooked = Math.round(((worseCount ?? 0) / (total ?? 1)) * 100);
+  // rank #1 = highest cooked score; lessCooked = pages with lower (better) score
+  const rank = (total ?? 0) - (lessCooked ?? 0);
+  const percentileCooked = Math.round(((lessCooked ?? 0) / (total ?? 1)) * 100);
 
   const rarityStyle = RARITY_STYLES[roast.rarity];
   const borderColor = rarityStyle.border;
@@ -131,7 +132,7 @@ export default async function RoastPage({
                 className="font-mono uppercase"
                 style={{ fontSize: 12, letterSpacing: '0.2em', color: '#444', marginBottom: 6 }}
               >
-                SURVIVAL RATE
+                COOKED SCORE
               </div>
               <div
                 className="font-mono uppercase"
@@ -189,11 +190,11 @@ export default async function RoastPage({
                     out of {total.toLocaleString()} roasted pages
                   </p>
 
-                  {roast.score < 30 ? (
+                  {roast.score >= 70 ? (
                     <p className="font-mono" style={{ fontSize: 15, color: '#E24B4A' }}>
                       🔥 top {100 - percentileCooked}% most cooked pages ever
                     </p>
-                  ) : roast.score < 50 ? (
+                  ) : roast.score >= 50 ? (
                     <p className="font-mono" style={{ fontSize: 15, color: '#EF9F27' }}>
                       your page is worse than {percentileCooked}% of all roasts
                     </p>

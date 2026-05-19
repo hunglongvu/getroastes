@@ -13,18 +13,18 @@ function rarityColor(rarity: string): string {
 }
 
 function survivalColor(score: number): string {
-  if (score <= 20) return '#ff4444';
-  if (score <= 40) return '#ff8c00';
-  if (score <= 60) return '#eab308';
-  if (score <= 80) return '#3b82f6';
+  if (score >= 80) return '#ff4444';
+  if (score >= 60) return '#ff8c00';
+  if (score >= 40) return '#eab308';
+  if (score >= 20) return '#3b82f6';
   return '#22c55e';
 }
 
 function diagnosis(score: number): string {
-  if (score <= 20) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
-  if (score <= 40) return 'THE WAITLIST WAS JUST FRIENDS';
-  if (score <= 60) return 'BUILT FOR A MARKET OF ONE (YOU)';
-  if (score <= 80) return 'YOUR MOM IS YOUR ONLY USER';
+  if (score >= 80) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
+  if (score >= 60) return 'THE WAITLIST WAS JUST FRIENDS';
+  if (score >= 40) return 'BUILT FOR A MARKET OF ONE (YOU)';
+  if (score >= 20) return 'YOUR MOM IS YOUR ONLY USER';
   return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
@@ -87,7 +87,7 @@ export async function GET(
 
         {/* SURVIVAL RATE LABEL */}
         <div style={{ fontSize: 12, letterSpacing: '0.2em', color: '#444', marginTop: 8, marginBottom: 24, display: 'flex', fontFamily: 'monospace' }}>
-          SURVIVAL RATE
+          COOKED SCORE
         </div>
 
         {/* DIVIDER */}
