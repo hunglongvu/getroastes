@@ -34,10 +34,10 @@ export function Embers() {
       particles.push({
         x: Math.random() * canvas!.width,
         y: -10,
-        size: 0.5 + Math.random() * 1.5,
+        size: 1 + Math.random() * 2,
         speedX: -0.3 + Math.random() * 0.6,
         speedY: 0.3 + Math.random() * 0.8,
-        opacity: 0.3 + Math.random() * 0.5,
+        opacity: 0.4 + Math.random() * 0.5,
         life: 0,
         maxLife: 200 + Math.random() * 300,
       });
@@ -50,7 +50,7 @@ export function Embers() {
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 
       frame++;
-      if (frame % 8 === 0) spawnParticle();
+      if (frame % 4 === 0) spawnParticle();
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
@@ -64,12 +64,12 @@ export function Embers() {
 
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(226, 75, 74, ${currentOpacity * flicker})`;
+        ctx!.fillStyle = `rgba(255, 100, 50, ${currentOpacity * flicker})`;
         ctx!.fill();
 
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(255, 100, 50, ${currentOpacity * 0.15 * flicker})`;
+        ctx!.fillStyle = `rgba(255, 150, 50, ${currentOpacity * 0.3 * flicker})`;
         ctx!.fill();
 
         if (p.life >= p.maxLife || p.y > canvas!.height) {
@@ -93,7 +93,7 @@ export function Embers() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 1 }}
     />
   );
 }
