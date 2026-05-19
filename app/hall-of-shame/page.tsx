@@ -91,7 +91,6 @@ export default async function HallOfShamePage() {
                       <span className="font-mono text-zinc-200 text-sm truncate">
                         {roast.domain}
                       </span>
-                      <span className="text-sm">{roast.characterEmoji}</span>
                     </div>
                     <p className="text-zinc-500 text-xs font-sans truncate">
                       &ldquo;{roast.roast}&rdquo;

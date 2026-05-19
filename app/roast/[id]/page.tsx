@@ -1,25 +1,17 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { getRoast } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
 import { RoastCard } from '@/app/components/RoastCard';
 import { Embers } from '@/app/components/Embers';
 import { RARITY_STYLES } from '@/lib/rarity';
-import type { Rarity } from '@/lib/rarity';
 
-const CAT_IMAGES: Record<Rarity, string> = {
-  MYTHIC: '/cats/mythic.jpg',
-  LEGENDARY: '/cats/legendary.jpg',
-  EPIC: '/cats/epic.jpg',
-  RARE: '/cats/rare.jpg',
-  COMMON: '/cats/common.jpg',
-};
-
-function scoreColor(score: number): string {
-  if (score <= 40) return '#E24B4A';
-  if (score <= 70) return '#EF9F27';
-  return '#639922';
+function survivalColor(score: number): string {
+  if (score <= 20) return '#ff4444';
+  if (score <= 40) return '#ff8c00';
+  if (score <= 60) return '#eab308';
+  if (score <= 80) return '#3b82f6';
+  return '#22c55e';
 }
 
 function exitCode(score: number): string {
@@ -29,6 +21,14 @@ function exitCode(score: number): string {
   if (score <= 70) return 'status: ships but barely';
   if (score <= 85) return 'build: passing';
   return 'merge approved';
+}
+
+function diagnosis(score: number): string {
+  if (score <= 20) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
+  if (score <= 40) return 'THE WAITLIST WAS JUST FRIENDS';
+  if (score <= 60) return 'BUILT FOR A MARKET OF ONE (YOU)';
+  if (score <= 80) return 'YOUR MOM IS YOUR ONLY USER';
+  return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
 export default async function RoastPage({
@@ -50,8 +50,9 @@ export default async function RoastPage({
 
   const rarityStyle = RARITY_STYLES[roast.rarity];
   const borderColor = rarityStyle.border;
-  const color = scoreColor(roast.score);
+  const color = survivalColor(roast.score);
   const code = exitCode(roast.score);
+  const diag = diagnosis(roast.score);
 
   return (
     <main
@@ -104,24 +105,14 @@ export default async function RoastPage({
           {/* RIGHT COLUMN — stats */}
           <div className="flex-1 flex flex-col gap-7">
 
-            {/* Rarity + cat */}
-            <div className="flex items-start gap-4">
-              <Image
-                src={CAT_IMAGES[roast.rarity]}
-                alt={roast.characterName}
-                width={80}
-                height={80}
-                unoptimized
-                style={{ borderRadius: 10, border: `2px solid ${borderColor}`, objectFit: 'cover', flexShrink: 0 }}
-              />
-              <div>
-                <p className="font-mono font-medium" style={{ fontSize: 14, color: borderColor }}>
-                  ✦ {roast.rarity} · {roast.characterName} {roast.characterEmoji}
-                </p>
-                <p className="font-sans italic" style={{ fontSize: 13, color: borderColor, opacity: 0.6, marginTop: 4, lineHeight: 1.4 }}>
-                  &ldquo;{roast.characterDescription}&rdquo;
-                </p>
-              </div>
+            {/* Diagnosis badge */}
+            <div>
+              <p className="font-mono font-bold" style={{ fontSize: 11, color: borderColor, letterSpacing: '0.15em' }}>
+                ✦ {roast.rarity}
+              </p>
+              <p className="font-mono" style={{ fontSize: 11, color: borderColor, opacity: 0.6, marginTop: 4, letterSpacing: '0.1em' }}>
+                {diag}
+              </p>
             </div>
 
             {/* Score + exit code + roast quote */}
@@ -138,7 +129,13 @@ export default async function RoastPage({
               </div>
               <div
                 className="font-mono uppercase"
-                style={{ fontSize: 12, letterSpacing: '0.2em', color, marginBottom: 20 }}
+                style={{ fontSize: 12, letterSpacing: '0.2em', color: '#444', marginBottom: 6 }}
+              >
+                SURVIVAL RATE
+              </div>
+              <div
+                className="font-mono uppercase"
+                style={{ fontSize: 11, letterSpacing: '0.15em', color, marginBottom: 20 }}
               >
                 {code}
               </div>
@@ -159,12 +156,7 @@ export default async function RoastPage({
             {/* Real talk */}
             <div
               className="fade-in-delay-2"
-              style={{
-                backgroundColor: '#0d0d0d',
-                border: '1px solid #2a2a2a',
-                borderRadius: 10,
-                padding: '24px 28px',
-              }}
+              style={{ backgroundColor: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '24px 28px' }}
             >
               <p className="font-mono" style={{ fontSize: 13, color: '#E24B4A', marginBottom: 10 }}>
                 // real talk
@@ -177,12 +169,7 @@ export default async function RoastPage({
             {/* Hall of Shame rank */}
             <div
               className="fade-in-delay-3"
-              style={{
-                backgroundColor: '#0d0d0d',
-                border: '1px solid #FFB800',
-                borderRadius: 10,
-                padding: '20px 24px',
-              }}
+              style={{ backgroundColor: '#0d0d0d', border: '1px solid #FFB800', borderRadius: 10, padding: '20px 24px' }}
             >
               <p className="font-mono" style={{ fontSize: 11, color: '#FFB800', marginBottom: 12 }}>
                 🏆 your rank

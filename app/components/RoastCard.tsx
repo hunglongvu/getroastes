@@ -1,41 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import type { RoastResult } from '@/lib/types';
-import type { Rarity } from '@/lib/rarity';
 import { RARITY_STYLES } from '@/lib/rarity';
-
-const CAT_IMAGES: Record<Rarity, string> = {
-  MYTHIC: '/cats/mythic.jpg',
-  LEGENDARY: '/cats/legendary.jpg',
-  EPIC: '/cats/epic.jpg',
-  RARE: '/cats/rare.jpg',
-  COMMON: '/cats/common.jpg',
-};
-
-const RARITY_SYMBOLS: Record<Rarity, string> = {
-  MYTHIC: '◈',
-  LEGENDARY: '▲',
-  EPIC: '⬡',
-  RARE: '◆',
-  COMMON: '○',
-};
-
-function scoreColor(score: number): string {
-  if (score <= 40) return '#E24B4A';
-  if (score <= 70) return '#EF9F27';
-  return '#639922';
-}
-
-function exitCode(score: number): string {
-  if (score <= 15) return 'SEGFAULT: NO_VALUE_PROP';
-  if (score <= 30) return 'exit code: COOKED';
-  if (score <= 50) return 'WARNING: NEEDS_REFACTOR';
-  if (score <= 70) return 'status: ships but barely';
-  if (score <= 85) return 'build: passing';
-  return 'merge approved';
-}
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -44,15 +11,29 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+function survivalColor(score: number): string {
+  if (score <= 20) return '#ff4444';
+  if (score <= 40) return '#ff8c00';
+  if (score <= 60) return '#eab308';
+  if (score <= 80) return '#3b82f6';
+  return '#22c55e';
+}
+
+function diagnosis(score: number): string {
+  if (score <= 20) return 'BUILDING IN PUBLIC, DYING IN PRIVATE';
+  if (score <= 40) return 'THE WAITLIST WAS JUST FRIENDS';
+  if (score <= 60) return 'BUILT FOR A MARKET OF ONE (YOU)';
+  if (score <= 80) return 'YOUR MOM IS YOUR ONLY USER';
+  return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
+}
+
 export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) {
-  const [imgError, setImgError] = useState(false);
   const [buttonState, setButtonState] = useState<'default' | 'capturing' | 'done'>('default');
 
-  const color = scoreColor(data.score);
-  const code = exitCode(data.score);
+  const sColor = survivalColor(data.score);
   const rarityStyle = RARITY_STYLES[data.rarity];
   const borderColor = rarityStyle.border;
-  const symbol = RARITY_SYMBOLS[data.rarity];
+  const diag = diagnosis(data.score);
 
   async function handleShareAndDownload() {
     if (buttonState !== 'default') return;
@@ -97,7 +78,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
 
   return (
     <div className="w-full" style={{ maxWidth: 340 }}>
-      {/* Pokemon card */}
+      {/* Meme card */}
       <div
         id="roast-card"
         className="pokemon-card"
@@ -111,77 +92,36 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
       >
         {/* HEADER */}
         <div style={{ backgroundColor: hexToRgba(borderColor, 0.2), borderBottom: `1px solid ${hexToRgba(borderColor, 0.3)}` }}>
-          {/* Row 1: domain + score HP */}
-          <div style={{
-            height: 44,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 14px',
-          }}>
+          <div style={{ height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 14px' }}>
             <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#fff', fontWeight: 600 }}>
               {data.domain}
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-              <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 800, color, lineHeight: 1 }}>
-                {data.score}
+              <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 800, color: sColor, lineHeight: 1 }}>
+                {data.score}%
               </span>
-              <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#555' }}>HP</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#555' }}>survival</span>
             </div>
           </div>
-          {/* Row 2: rarity + character */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '4px 14px 8px',
-          }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: borderColor }}>
-              ⬡ {data.rarity}
-            </span>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: borderColor }}>
-              {data.characterEmoji} {data.characterName}
+          <div style={{ padding: '4px 14px 8px' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 9, color: borderColor, letterSpacing: '0.08em' }}>
+              {diag}
             </span>
           </div>
         </div>
 
-        {/* CAT IMAGE */}
-        <div style={{ height: 200, width: '100%', overflow: 'hidden', position: 'relative' }}>
-          {!imgError ? (
-            <Image
-              src={CAT_IMAGES[data.rarity]}
-              alt={data.characterName}
-              fill
-              unoptimized
-              crossOrigin="anonymous"
-              onError={() => setImgError(true)}
-              style={{ objectFit: 'cover', objectPosition: 'center top' }}
-            />
-          ) : (
-            <div style={{ width: '100%', height: '100%', backgroundColor: '#111' }} />
-          )}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 60,
-            background: 'linear-gradient(transparent, #080808)',
-            pointerEvents: 'none',
-          }} />
+        {/* SCORE BLOCK */}
+        <div style={{ padding: '20px 14px 16px', backgroundColor: '#080808' }}>
+          <div style={{ fontFamily: 'monospace', fontSize: 72, fontWeight: 900, color: sColor, lineHeight: 1, letterSpacing: -3 }}>
+            {data.score}
+          </div>
+          <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#444', letterSpacing: '0.2em', marginTop: 4 }}>
+            SURVIVAL RATE
+          </div>
         </div>
 
-        {/* MOVE BAR */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '8px 14px',
-          backgroundColor: hexToRgba(borderColor, 0.1),
-          borderTop: `1px solid ${hexToRgba(borderColor, 0.2)}`,
-          borderBottom: `1px solid ${hexToRgba(borderColor, 0.2)}`,
-        }}>
-          <span style={{ fontFamily: 'monospace', fontSize: 10, color: borderColor, letterSpacing: '0.1em' }}>
-            ⚡ {code}
-          </span>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
-        </div>
+        {/* DIVIDER */}
+        <div style={{ height: 1, backgroundColor: '#1a1a1a', margin: '0 14px' }} />
 
         {/* ROAST */}
         <div style={{ padding: '14px 14px 10px', backgroundColor: '#080808' }}>
@@ -191,19 +131,13 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
         </div>
 
         {/* FOOTER */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '8px 14px',
-          borderTop: '1px solid #111',
-        }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 14px', borderTop: '1px solid #111' }}>
           <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#222' }}>getroasted.wtf</span>
           {rank != null && (
             <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#333' }}>#{rank} Hall of Shame</span>
           )}
           <span style={{ fontFamily: 'monospace', fontSize: 9, color: hexToRgba(borderColor, 0.5) }}>
-            {symbol} {data.rarity}
+            {data.rarity}
           </span>
         </div>
       </div>
