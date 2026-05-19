@@ -133,49 +133,20 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        background: 'rgba(0,0,0,0.95)',
-        backdropFilter: 'blur(8px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        transition: 'opacity 0.15s',
-        opacity: visible ? 1 : 0,
-      }}
+      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
+      style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.15s' }}
     >
       {/* Terminal window */}
       <div
-        style={{
-          width: 'min(640px, 92vw)',
-          background: '#0d0d0d',
-          borderRadius: '10px',
-          border: '1px solid #2a2a2a',
-          boxShadow: '0 30px 100px rgba(0,0,0,0.9)',
-          overflow: 'hidden',
-          position: 'relative',
-        }}
+        className="w-full max-w-[640px] mx-4 rounded-[10px] overflow-hidden"
+        style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', boxShadow: '0 30px 100px rgba(0,0,0,0.9)' }}
       >
         {/* Title bar */}
         <div
-          style={{
-            height: 38,
-            backgroundColor: '#1c1c1c',
-            borderBottom: '1px solid #2a2a2a',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 16px',
-            position: 'relative',
-          }}
+          className="flex items-center px-4 gap-2"
+          style={{ height: '38px', background: '#1c1c1c', borderBottom: '1px solid #2a2a2a', position: 'relative' }}
         >
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="flex gap-2">
             {(['#E24B4A', '#EF9F27', '#639922'] as const).map((c) => (
               <div
                 key={c}
