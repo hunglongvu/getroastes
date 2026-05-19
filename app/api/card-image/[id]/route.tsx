@@ -66,8 +66,8 @@ export async function GET(
           alignItems: 'center',
           padding: `${PAD}px ${PAD}px 16px ${PAD}px`,
         }}>
-          <span style={{ color: '#aaaaaa', fontSize: 15, fontFamily: 'monospace' }}>{roast.domain}</span>
-          <span style={{ color: rColor, fontSize: 14, fontFamily: 'monospace', letterSpacing: '0.15em', fontWeight: 700 }}>{diag}</span>
+          <span style={{ color: '#cccccc', fontSize: 17, fontFamily: 'monospace' }}>{roast.domain}</span>
+          <span style={{ color: rColor, fontSize: 17, fontFamily: 'monospace', letterSpacing: '0.15em', fontWeight: 900 }}>{diag}</span>
         </div>
 
         {/* 2. SCREENSHOT — full bleed */}
@@ -91,7 +91,7 @@ export async function GET(
           <div style={{ fontSize: 180, fontWeight: 900, letterSpacing: -8, lineHeight: 1, color: sColor, display: 'flex' }}>
             {roast.score}%
           </div>
-          <div style={{ fontSize: 14, letterSpacing: '0.25em', color: '#666', marginTop: 8, display: 'flex', fontFamily: 'monospace' }}>
+          <div style={{ fontSize: 20, letterSpacing: '0.3em', color: '#999', marginTop: 8, display: 'flex', fontFamily: 'monospace', fontWeight: 700 }}>
             COOKED SCORE
           </div>
         </div>
@@ -100,13 +100,21 @@ export async function GET(
         <div style={{ height: 1, background: '#1a1a1a', margin: `24px ${PAD}px`, display: 'flex' }} />
 
         {/* 5. ROAST QUOTE */}
-        <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.4, color: '#ffffff', padding: `0 ${PAD}px 48px ${PAD}px`, display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{
+          fontSize: 38, fontWeight: 900, lineHeight: 1.4, color: '#ffffff',
+          padding: `0 ${PAD}px 48px ${PAD}px`,
+          display: 'flex', flexWrap: 'wrap',
+          borderLeft: `4px solid ${rColor}`,
+          marginLeft: PAD,
+          paddingLeft: 24,
+          paddingRight: PAD,
+        }}>
           &ldquo;{roast.roast}&rdquo;
         </div>
 
         {/* 6. BOTTOM BAR */}
         <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', padding: `0 ${PAD}px 40px ${PAD}px`, marginTop: 'auto' }}>
-          <span style={{ color: '#555', fontSize: 13, fontFamily: 'monospace' }}>getroasted.wtf</span>
+          <span style={{ color: '#888', fontSize: 16, fontFamily: 'monospace' }}>getroasted.wtf</span>
         </div>
       </div>
     ),
