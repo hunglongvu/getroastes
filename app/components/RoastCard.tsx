@@ -64,28 +64,16 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     );
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
-    try {
-      const res = await fetch(`/api/card-image/${data.id}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const link = document.createElement('a');
+    link.href = `/api/card-image/${data.id}`;
+    link.download = `roast-${data.domain}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `roast-${data.domain}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      setButtonState('done');
-      setTimeout(() => window.open(tweetUrl, '_blank'), 800);
-      setTimeout(() => setButtonState('default'), 3000);
-    } catch (err) {
-      console.error('Download failed:', err);
-      setButtonState('default');
-      window.open(tweetUrl, '_blank');
-    }
+    setButtonState('done');
+    setTimeout(() => window.open(tweetUrl, '_blank'), 1000);
+    setTimeout(() => setButtonState('default'), 3000);
   }
 
   return (

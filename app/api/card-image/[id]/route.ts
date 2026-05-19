@@ -4,7 +4,7 @@ import path from 'path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { getRoast } from '@/lib/store';
-import { RARITY_STYLES } from '@/lib/rarity';
+import { RARITY_STYLES, CHARACTERS } from '@/lib/rarity';
 
 function scoreColor(score: number): string {
   if (score <= 40) return '#E24B4A';
@@ -12,7 +12,7 @@ function scoreColor(score: number): string {
   return '#639922';
 }
 
-function getExitCode(score: number): string {
+function exitCode(score: number): string {
   if (score <= 15) return 'SEGFAULT: NO_VALUE_PROP';
   if (score <= 30) return 'exit code: COOKED';
   if (score <= 50) return 'WARNING: NEEDS_REFACTOR';
@@ -21,20 +21,35 @@ function getExitCode(score: number): string {
   return 'merge approved';
 }
 
-let fontPromise: Promise<{ normal: ArrayBuffer; bold: ArrayBuffer }> | null = null;
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+const RARITY_SYMBOLS: Record<string, string> = {
+  MYTHIC: '◈',
+  LEGENDARY: '▲',
+  EPIC: '⬡',
+  RARE: '◆',
+  COMMON: '○',
+};
+
+let fontPromise: Promise<{ r400: ArrayBuffer; r700: ArrayBuffer; r800: ArrayBuffer }> | null = null;
 
 function getFonts() {
   if (!fontPromise) {
-    fontPromise = (async () => {
-      const base = path.join(process.cwd(), 'node_modules/@fontsource/inter/files');
-      const [n, b] = await Promise.all([
-        fs.readFile(path.join(base, 'inter-latin-400-normal.woff')),
-        fs.readFile(path.join(base, 'inter-latin-700-normal.woff')),
-      ]);
-      const normal = n.buffer.slice(n.byteOffset, n.byteOffset + n.byteLength);
-      const bold = b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
-      return { normal, bold };
-    })();
+    const base = path.join(process.cwd(), 'node_modules/@fontsource/inter/files');
+    fontPromise = Promise.all([
+      fs.readFile(path.join(base, 'inter-latin-400-normal.woff')),
+      fs.readFile(path.join(base, 'inter-latin-700-normal.woff')),
+      fs.readFile(path.join(base, 'inter-latin-800-normal.woff')),
+    ]).then(([n, b, h]) => ({
+      r400: n.buffer.slice(n.byteOffset, n.byteOffset + n.byteLength),
+      r700: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength),
+      r800: h.buffer.slice(h.byteOffset, h.byteOffset + h.byteLength),
+    }));
   }
   return fontPromise;
 }
@@ -42,16 +57,22 @@ function getFonts() {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type El = any;
 
-function box(style: Record<string, unknown>, children: El[]): El {
-  const filtered = children.filter(Boolean);
+function flex(style: Record<string, unknown>, children: El | El[]): El {
   return {
     type: 'div',
     props: {
       style: { display: 'flex', ...style },
-      children: filtered.length === 1 ? filtered[0] : filtered,
+      children,
     },
   };
 }
+
+function text(content: string, style: Record<string, unknown>): El {
+  return { type: 'span', props: { style, children: content } };
+}
+
+const W = 680;
+const CAT_H = 340;
 
 export async function GET(
   _request: NextRequest,
@@ -61,12 +82,16 @@ export async function GET(
   const roast = await getRoast(id);
   if (!roast) return new Response('Not found', { status: 404 });
 
-  const fonts = await getFonts();
+  const [fonts] = await Promise.all([getFonts()]);
 
   const rarityStyle = RARITY_STYLES[roast.rarity];
+  const character = CHARACTERS[roast.rarity];
   const borderColor = rarityStyle.border;
-  const scoreCol = scoreColor(roast.score);
-  const code = getExitCode(roast.score);
+  const sColor = scoreColor(roast.score);
+  const code = exitCode(roast.score);
+  const symbol = RARITY_SYMBOLS[roast.rarity] ?? '○';
+  const cleanStderr = roast.stderr.replace(/\*\*(.*?)\*\*/g, '$1');
+  const stderrSnippet = cleanStderr.length > 160 ? cleanStderr.slice(0, 157) + '...' : cleanStderr;
 
   let catSrc = '';
   try {
@@ -74,105 +99,119 @@ export async function GET(
       path.join(process.cwd(), 'public', 'cats', `${roast.rarity.toLowerCase()}.jpg`),
     );
     catSrc = `data:image/jpeg;base64,${buf.toString('base64')}`;
-  } catch {}
+  } catch { /* no cat image — skip */ }
 
-  const W = 800;
-  const PAD = 60;
-
-  const card = box(
+  const card = flex(
     {
       flexDirection: 'column',
-      justifyContent: 'space-between',
       width: W,
-      height: W,
       backgroundColor: '#080808',
-      border: `2px solid ${borderColor}`,
+      border: `3px solid ${borderColor}`,
       borderRadius: 16,
-      padding: PAD,
+      overflow: 'hidden',
     },
     [
-      // 1 · Rarity badge + character description
-      box({ flexDirection: 'column' }, [
-        box(
-          { fontSize: 18, fontWeight: 700, color: borderColor },
-          [`✦ ${roast.rarity} · ${roast.characterName} ${roast.characterEmoji}`],
-        ),
-        box(
-          { fontSize: 15, fontStyle: 'italic', color: borderColor, opacity: 0.7, marginTop: 6 },
-          [`"${roast.characterDescription}"`],
-        ),
-      ]),
+      // ── HEADER ──
+      flex(
+        {
+          flexDirection: 'column',
+          backgroundColor: hexToRgba(borderColor, 0.2),
+          borderBottom: `1px solid ${hexToRgba(borderColor, 0.3)}`,
+          padding: '12px 20px 10px',
+        },
+        [
+          // Row 1: domain + score HP
+          flex({ justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }, [
+            text(roast.domain, { color: '#ffffff', fontSize: 14, fontWeight: 600 }),
+            flex({ alignItems: 'baseline', gap: 4 }, [
+              text(String(roast.score), { color: sColor, fontSize: 26, fontWeight: 800, lineHeight: 1 }),
+              text('HP', { color: '#555', fontSize: 11 }),
+            ]),
+          ]),
+          // Row 2: rarity badge + character
+          flex({ justifyContent: 'space-between', alignItems: 'center' }, [
+            text(`⬡ ${roast.rarity}`, { color: borderColor, fontSize: 11 }),
+            text(`${character.emoji} ${character.name}`, { color: borderColor, fontSize: 11 }),
+          ]),
+        ],
+      ),
 
-      // 2 · Cat image
-      catSrc &&
-        box({ justifyContent: 'center' }, [
-          {
+      // ── CAT IMAGE ──
+      catSrc
+        ? {
             type: 'img',
             props: {
               src: catSrc,
-              width: 180,
-              height: 180,
-              style: {
-                borderRadius: 14,
-                border: `3px solid ${borderColor}`,
-                objectFit: 'cover',
-              },
+              width: W,
+              height: CAT_H,
+              style: { objectFit: 'cover', objectPosition: 'center top', display: 'block' },
             },
-          },
-        ]),
+          }
+        : flex(
+            { width: W, height: CAT_H, backgroundColor: '#111', alignItems: 'center', justifyContent: 'center' },
+            [text('no image', { color: '#333', fontSize: 12 })],
+          ),
 
-      // 3 · Score
-      box({ flexDirection: 'column', alignItems: 'center' }, [
-        box(
-          {
-            fontSize: 160,
-            fontWeight: 700,
-            color: scoreCol,
-            lineHeight: 1,
-            letterSpacing: -6,
-          },
-          [String(roast.score)],
-        ),
-        box(
-          {
-            fontSize: 14,
-            color: scoreCol,
-            letterSpacing: 3,
-            marginTop: 10,
-          },
-          [code.toUpperCase()],
-        ),
-      ]),
+      // ── MOVE BAR ──
+      flex(
+        {
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px 20px',
+          backgroundColor: hexToRgba(borderColor, 0.1),
+          borderTop: `1px solid ${hexToRgba(borderColor, 0.2)}`,
+          borderBottom: `1px solid ${hexToRgba(borderColor, 0.2)}`,
+        },
+        [
+          text(`⚡ ${code}`, { color: borderColor, fontSize: 11, letterSpacing: 1 }),
+          flex(
+            { width: 8, height: 8, borderRadius: 4, backgroundColor: sColor },
+            [],
+          ),
+        ],
+      ),
 
-      // 4 · Roast quote
-      box({ justifyContent: 'center' }, [
-        box(
-          {
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            fontSize: 28,
-            color: '#ffffff',
-            lineHeight: 1.4,
-            maxWidth: 620,
-            flexWrap: 'wrap',
-          },
-          [`"${roast.roast}"`],
-        ),
-      ]),
+      // ── ROAST TEXT ──
+      flex(
+        { flexDirection: 'column', padding: '20px 20px 16px', gap: 12 },
+        [
+          text(`"${roast.roast}"`, { color: '#ffffff', fontSize: 18, fontWeight: 700, lineHeight: 1.4 }),
+          flex({ height: 1, backgroundColor: '#1a1a1a' }, []),
+          text('// real talk', { color: '#E24B4A', fontSize: 10, letterSpacing: 1 }),
+          text(stderrSnippet, { color: '#666', fontSize: 12, lineHeight: 1.6 }),
+        ],
+      ),
 
-      // 5 · Footer
-      box({ justifyContent: 'center', fontSize: 18, color: '#333' }, ['getroasted.wtf']),
+      // ── FOOTER ──
+      flex(
+        {
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px 20px',
+          borderTop: '1px solid #111',
+        },
+        [
+          text('getroasted.wtf', { color: '#222', fontSize: 10 }),
+          text(`${symbol} ${roast.rarity}`, { color: hexToRgba(borderColor, 0.5), fontSize: 10 }),
+        ],
+      ),
     ],
   );
 
+  // Wrap in a sized container so satori knows total height
+  const root = flex(
+    { width: W, flexDirection: 'column' },
+    [card],
+  );
+
   try {
-    const svg = await satori(card, {
+    const svg = await satori(root, {
       width: W,
-      height: W,
+      height: 950,
       fonts: [
-        { name: 'Inter', data: fonts.normal, weight: 400, style: 'normal' },
-        { name: 'Inter', data: fonts.bold, weight: 700, style: 'normal' },
+        { name: 'Inter', data: fonts.r400, weight: 400, style: 'normal' },
+        { name: 'Inter', data: fonts.r700, weight: 700, style: 'normal' },
+        { name: 'Inter', data: fonts.r800, weight: 800, style: 'normal' },
       ],
     });
 
