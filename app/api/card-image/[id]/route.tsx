@@ -28,9 +28,11 @@ function diagnosis(score: number): string {
   return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
-// 2x scale — all px values are doubled so the output is retina-sharp at 800px display size
+// 2x — render at 1600px so it's retina-sharp when displayed at 800px
 const S = 2;
-const W = 800 * S; // 1600px output
+const W = 800 * S;
+const H = 900 * S;
+const PAD = 32 * S;
 
 export async function GET(
   _req: Request,
@@ -47,14 +49,13 @@ export async function GET(
     ? `data:image/jpeg;base64,${roast.screenshotBase64}`
     : null;
 
-  const PAD = 32 * S;
-
   return new ImageResponse(
     (
       <div
         style={{
           background: '#080808',
           width: `${W}px`,
+          height: `${H}px`,
           display: 'flex',
           flexDirection: 'column',
           color: '#e5e5e5',
@@ -66,6 +67,7 @@ export async function GET(
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: `${20 * S}px ${PAD}px ${16 * S}px ${PAD}px`,
+          flexShrink: 0,
         }}>
           <span style={{ color: '#666', fontSize: 13 * S, fontFamily: 'monospace', letterSpacing: '0.05em' }}>
             {roast.domain}
@@ -83,16 +85,16 @@ export async function GET(
             alt={roast.domain}
             width={W}
             height={220 * S}
-            style={{ objectFit: 'cover', objectPosition: 'top' }}
+            style={{ objectFit: 'cover', objectPosition: 'top', flexShrink: 0 }}
           />
         ) : (
-          <div style={{ width: W, height: 220 * S, background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: W, height: 220 * S, background: '#111', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: '#333', fontSize: 12 * S }}>no screenshot</span>
           </div>
         )}
 
         {/* 3. SCORE BLOCK — centered */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${32 * S}px ${PAD}px 0 ${PAD}px` }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${32 * S}px ${PAD}px 0 ${PAD}px`, flexShrink: 0 }}>
           <div style={{ fontSize: 140 * S, fontWeight: 900, letterSpacing: `${-6 * S}px`, lineHeight: 1, color: sColor, display: 'flex' }}>
             {roast.score}%
           </div>
@@ -102,7 +104,7 @@ export async function GET(
         </div>
 
         {/* 4. DIVIDER */}
-        <div style={{ height: 1 * S, background: '#1a1a1a', margin: `${24 * S}px ${PAD}px`, display: 'flex' }} />
+        <div style={{ height: 1 * S, background: '#1a1a1a', margin: `${24 * S}px ${PAD}px`, flexShrink: 0, display: 'flex' }} />
 
         {/* 5. ROAST QUOTE */}
         <div style={{
@@ -111,11 +113,15 @@ export async function GET(
           padding: `0 ${28 * S}px ${28 * S}px ${16 * S}px`,
           display: 'flex',
           flexWrap: 'wrap',
+          flexShrink: 0,
         }}>
           <span style={{ fontSize: 22 * S, fontWeight: 900, color: '#ffffff', lineHeight: 1.4 }}>
             &ldquo;{roast.roast}&rdquo;
           </span>
         </div>
+
+        {/* spacer — pushes bottom bar down (marginTop: auto not supported by Satori) */}
+        <div style={{ flex: 1, display: 'flex' }} />
 
         {/* 6. BOTTOM BAR */}
         <div style={{
@@ -123,13 +129,13 @@ export async function GET(
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: `${16 * S}px ${PAD}px ${24 * S}px ${PAD}px`,
-          marginTop: 'auto',
+          flexShrink: 0,
         }}>
           <span style={{ color: '#555', fontSize: 13 * S, fontFamily: 'monospace' }}>getroasted.wtf</span>
           <span style={{ color: rColor, fontSize: 11 * S, fontFamily: 'monospace', letterSpacing: '0.15em' }}>{diag}</span>
         </div>
       </div>
     ),
-    { width: W },
+    { width: W, height: H },
   );
 }
