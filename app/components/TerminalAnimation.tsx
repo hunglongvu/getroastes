@@ -137,43 +137,20 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
       className="fixed inset-0 bg-black flex items-center justify-center"
       style={{ zIndex: 99999, opacity: visible ? 1 : 0, transition: 'opacity 0.15s' }}
     >
-      {/* Grill section */}
-      <div style={{ textAlign: 'center', marginBottom: '16px', fontFamily: 'monospace' }}>
-        <div style={{ fontSize: '15px', color: '#E24B4A', marginBottom: '8px', fontWeight: '600', letterSpacing: '0.05em' }}>
+      {/* Burning domain */}
+      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <div style={{
+          fontFamily: 'monospace', fontSize: '16px', fontWeight: '600', color: '#E24B4A',
+          textShadow: '0 0 20px rgba(226,75,74,0.8), 0 0 40px rgba(255,100,0,0.4)',
+          animation: 'fire-flicker 1.5s ease-in-out infinite', letterSpacing: '0.05em',
+        }}>
           🔥 {domain} 🔥
         </div>
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: '6px', padding: '8px 40px',
-            background: 'linear-gradient(180deg, rgba(226,75,74,0.1) 0%, transparent 100%)',
-            borderRadius: '4px', border: '1px solid #333', position: 'relative', overflow: 'hidden',
-          }}>
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
-              background: 'linear-gradient(0deg, rgba(255,100,0,0.15) 0%, transparent 100%)',
-              animation: 'flicker 0.8s ease-in-out infinite alternate',
-            }} />
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} style={{
-                height: '3px', background: 'linear-gradient(90deg, #333, #555, #333)',
-                borderRadius: '2px', width: '200px', position: 'relative', zIndex: 1,
-              }} />
-            ))}
-            <div style={{
-              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-              fontSize: '11px', color: 'rgba(255,150,50,0.7)', fontFamily: 'monospace',
-              whiteSpace: 'nowrap', zIndex: 2, textShadow: '0 0 8px rgba(255,100,0,0.8)',
-              animation: 'flicker 1.2s ease-in-out infinite alternate',
-            }}>
-              {domain}
-            </div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginTop: '2px', fontSize: '18px', animation: 'flicker 0.6s ease-in-out infinite alternate' }}>
-            🔥🔥🔥🔥🔥
-          </div>
-        </div>
-        <div style={{ fontSize: '12px', color: '#444', marginTop: '4px', fontFamily: 'monospace', animation: 'rise 2s ease-in-out infinite' }}>
-          💨 roasting in progress...
+        <div style={{
+          fontFamily: 'monospace', fontSize: '11px', color: '#444', marginTop: '6px',
+          animation: 'rise 2s ease-in-out infinite',
+        }}>
+          roasting in progress...
         </div>
       </div>
 
