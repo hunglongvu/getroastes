@@ -49,8 +49,9 @@ export function RoastCard({ data }: { data: RoastResult }) {
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
+    const cleanStderr = data.stderr.replace(/\*\*(.*?)\*\*/g, '$1').slice(0, 120);
     const tweetText = encodeURIComponent(
-      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${data.roast}"\n\n📎 attach the downloaded pic to this tweet\n\ngetroasted.wtf`
+      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${data.roast}"\n\nreal talk: ${cleanStderr}\n\n📎 attach the pic!\n\ngetroasted.wtf`
     );
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
@@ -204,7 +205,7 @@ export function RoastCard({ data }: { data: RoastResult }) {
             <p className="font-mono" style={{ fontSize: 11, color: '#E24B4A', marginBottom: 8 }}>
               // real talk
             </p>
-            <p style={{ fontSize: 14, color: '#777', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.55 }}>
               {data.stderr.replace(/\*\*/g, '')}
             </p>
           </div>
