@@ -64,9 +64,8 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     }
 
     setTimeout(() => {
-      const shortRoast = data.roast.length > 100 ? data.roast.slice(0, 97) + '...' : data.roast;
       const tweetText = encodeURIComponent(
-        `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n"${shortRoast}"\n\ngetroasted.wtf 🔥`
+        `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n"${data.roast}"\n\ngetroasted.wtf 🔥`
       );
       window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
       setTimeout(() => setButtonState('default'), 2000);
