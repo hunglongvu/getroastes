@@ -28,9 +28,9 @@ function diagnosis(score: number): string {
   return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
-const W = 800;
-const H = 900;
-const PAD = 56;
+// 2x scale — all px values are doubled so the output is retina-sharp at 800px display size
+const S = 2;
+const W = 800 * S; // 1600px output
 
 export async function GET(
   _req: Request,
@@ -47,27 +47,32 @@ export async function GET(
     ? `data:image/jpeg;base64,${roast.screenshotBase64}`
     : null;
 
+  const PAD = 32 * S;
+
   return new ImageResponse(
     (
       <div
         style={{
           background: '#080808',
           width: `${W}px`,
-          height: `${H}px`,
           display: 'flex',
           flexDirection: 'column',
           color: '#e5e5e5',
         }}
       >
-        {/* 1. HEADER ROW */}
+        {/* 1. HEADER */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: `${PAD}px ${PAD}px 16px ${PAD}px`,
+          padding: `${20 * S}px ${PAD}px ${16 * S}px ${PAD}px`,
         }}>
-          <span style={{ color: '#cccccc', fontSize: 17, fontFamily: 'monospace' }}>{roast.domain}</span>
-          <span style={{ color: rColor, fontSize: 17, fontFamily: 'monospace', letterSpacing: '0.15em', fontWeight: 900 }}>{diag}</span>
+          <span style={{ color: '#666', fontSize: 13 * S, fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+            {roast.domain}
+          </span>
+          <span style={{ color: rColor, fontSize: 11 * S, fontFamily: 'monospace', letterSpacing: '0.2em', fontWeight: 700 }}>
+            {diag}
+          </span>
         </div>
 
         {/* 2. SCREENSHOT — full bleed */}
@@ -77,48 +82,54 @@ export async function GET(
             src={screenshotSrc}
             alt={roast.domain}
             width={W}
-            height={300}
+            height={220 * S}
             style={{ objectFit: 'cover', objectPosition: 'top' }}
           />
         ) : (
-          <div style={{ width: W, height: 300, background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#333', fontSize: 12 }}>no screenshot</span>
+          <div style={{ width: W, height: 220 * S, background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ color: '#333', fontSize: 12 * S }}>no screenshot</span>
           </div>
         )}
 
-        {/* 3. SCORE BLOCK */}
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, padding: `40px ${PAD}px 0 ${PAD}px` }}>
-          <div style={{ fontSize: 180, fontWeight: 900, letterSpacing: -8, lineHeight: 1, color: sColor, display: 'flex' }}>
+        {/* 3. SCORE BLOCK — centered */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${32 * S}px ${PAD}px 0 ${PAD}px` }}>
+          <div style={{ fontSize: 140 * S, fontWeight: 900, letterSpacing: `${-6 * S}px`, lineHeight: 1, color: sColor, display: 'flex' }}>
             {roast.score}%
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: '#999', letterSpacing: '0.2em', lineHeight: 1.3 }}>
-            <span>COOKED</span>
-            <span>SCORE</span>
+          <div style={{ fontSize: 22 * S, fontWeight: 700, letterSpacing: '0.3em', color: '#777', marginTop: 8 * S, display: 'flex', fontFamily: 'monospace' }}>
+            COOKED SCORE
           </div>
         </div>
 
         {/* 4. DIVIDER */}
-        <div style={{ height: 1, background: '#1a1a1a', margin: `24px ${PAD}px`, display: 'flex' }} />
+        <div style={{ height: 1 * S, background: '#1a1a1a', margin: `${24 * S}px ${PAD}px`, display: 'flex' }} />
 
         {/* 5. ROAST QUOTE */}
         <div style={{
-          fontSize: 38, fontWeight: 900, lineHeight: 1.4, color: '#ffffff',
-          padding: `0 ${PAD}px 48px ${PAD}px`,
-          display: 'flex', flexWrap: 'wrap',
-          borderLeft: `4px solid ${rColor}`,
-          marginLeft: PAD,
-          paddingLeft: 24,
-          paddingRight: PAD,
+          margin: `0 ${PAD}px 0 ${28 * S}px`,
+          borderLeft: `${4 * S}px solid ${rColor}`,
+          padding: `0 ${28 * S}px ${28 * S}px ${16 * S}px`,
+          display: 'flex',
+          flexWrap: 'wrap',
         }}>
-          &ldquo;{roast.roast}&rdquo;
+          <span style={{ fontSize: 22 * S, fontWeight: 900, color: '#ffffff', lineHeight: 1.4 }}>
+            &ldquo;{roast.roast}&rdquo;
+          </span>
         </div>
 
         {/* 6. BOTTOM BAR */}
-        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', padding: `0 ${PAD}px 40px ${PAD}px`, marginTop: 'auto' }}>
-          <span style={{ color: '#888', fontSize: 16, fontFamily: 'monospace' }}>getroasted.wtf</span>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: `${16 * S}px ${PAD}px ${24 * S}px ${PAD}px`,
+          marginTop: 'auto',
+        }}>
+          <span style={{ color: '#555', fontSize: 13 * S, fontFamily: 'monospace' }}>getroasted.wtf</span>
+          <span style={{ color: rColor, fontSize: 11 * S, fontFamily: 'monospace', letterSpacing: '0.15em' }}>{diag}</span>
         </div>
       </div>
     ),
-    { width: W, height: H },
+    { width: W },
   );
 }
