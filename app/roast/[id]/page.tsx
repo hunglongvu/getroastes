@@ -154,18 +154,6 @@ export default async function RoastPage({
               </p>
             </div>
 
-            {/* Real talk */}
-            <div
-              className="fade-in-delay-2"
-              style={{ backgroundColor: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '24px 28px' }}
-            >
-              <p className="font-mono" style={{ fontSize: 13, color: '#E24B4A', marginBottom: 10 }}>
-                // real talk
-              </p>
-              <p style={{ fontSize: 16, color: '#999', lineHeight: 1.8 }}>
-                {roast.stderr.replace(/\*\*/g, '')}
-              </p>
-            </div>
 
             {/* Hall of Shame rank */}
             <div
