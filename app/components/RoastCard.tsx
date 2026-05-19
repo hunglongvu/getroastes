@@ -29,136 +29,28 @@ function exitCode(score: number): string {
   return 'merge approved';
 }
 
-function CardDisplay({ data }: { data: RoastResult }) {
-  const [imgError, setImgError] = useState(false);
-  const color = scoreColor(data.score);
-  const code = exitCode(data.score);
-  const rarityStyle = RARITY_STYLES[data.rarity];
-
-  return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{
-        aspectRatio: '1 / 1',
-        backgroundColor: '#080808',
-        border: `1px solid ${rarityStyle.border}`,
-        boxShadow: rarityStyle.glow,
-        borderRadius: 12,
-      }}
-    >
-      {/* Subtle diagonal watermark */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
-        <span
-          className="text-white font-mono font-bold whitespace-nowrap select-none"
-          style={{
-            fontSize: '3rem',
-            opacity: 0.025,
-            transform: 'rotate(-30deg) scaleX(1.6)',
-            letterSpacing: '0.08em',
-          }}
-        >
-          getroasted.wtf &nbsp; getroasted.wtf &nbsp; getroasted.wtf
-        </span>
-      </div>
-
-      {/* Content — 5 sections distributed vertically */}
-      <div
-        className="relative flex flex-col"
-        style={{ height: '100%', padding: '24px', justifyContent: 'space-between' }}
-      >
-        {/* 1 · Rarity badge */}
-        <div>
-          <p
-            className="font-mono font-bold"
-            style={{ fontSize: 13, color: rarityStyle.border }}
-          >
-            ✦ {data.rarity} · {data.characterName} {data.characterEmoji}
-          </p>
-          <p
-            className="font-sans italic"
-            style={{ fontSize: 12, color: rarityStyle.border, opacity: 0.7, marginTop: 3 }}
-          >
-            &ldquo;{data.characterDescription}&rdquo;
-          </p>
-        </div>
-
-        {/* 2 · Cat image */}
-        {!imgError && (
-          <div className="flex justify-center">
-            <Image
-              src={CAT_IMAGES[data.rarity]}
-              alt={data.characterName}
-              width={140}
-              height={140}
-              unoptimized
-              crossOrigin="anonymous"
-              onError={() => setImgError(true)}
-              style={{
-                borderRadius: 10,
-                border: `2px solid ${rarityStyle.border}`,
-                objectFit: 'cover',
-              }}
-            />
-          </div>
-        )}
-
-        {/* 3 · Score */}
-        <div className="text-center">
-          <div
-            className="font-mono font-bold leading-none"
-            style={{ fontSize: 96, color }}
-          >
-            {data.score}
-          </div>
-          <div
-            className="font-mono uppercase"
-            style={{ fontSize: 11, letterSpacing: '0.15em', color, marginTop: 6 }}
-          >
-            {code}
-          </div>
-        </div>
-
-        {/* 4 · Roast quote */}
-        <div className="text-center" style={{ padding: '0 5%' }}>
-          <p
-            className="font-sans italic"
-            style={{ fontSize: 17, color: '#ffffff', lineHeight: 1.4 }}
-          >
-            &ldquo;{data.roast}&rdquo;
-          </p>
-        </div>
-
-        {/* 5 · Footer */}
-        <div className="text-center">
-          <span className="font-mono" style={{ fontSize: 11, color: '#333' }}>
-            getroasted.wtf
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 export function RoastCard({ data }: { data: RoastResult }) {
-  const [fullscreen, setFullscreen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const [buttonState, setButtonState] = useState<'default' | 'capturing' | 'done'>('default');
 
-  useEffect(() => {
-    if (!fullscreen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setFullscreen(false);
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [fullscreen]);
+  const color = scoreColor(data.score);
+  const code = exitCode(data.score);
+  const rarityStyle = RARITY_STYLES[data.rarity];
+  const borderColor = rarityStyle.border;
 
   async function handleShareAndDownload() {
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    const code = exitCode(data.score);
     const tweetText = encodeURIComponent(
-      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${code}\n\n"${data.roast}"\n\n📎 attach the downloaded pic to this tweet\n\ngetroasted.wtf`
+      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${data.roast}"\n\n📎 attach the downloaded pic to this tweet\n\ngetroasted.wtf`
     );
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
@@ -188,18 +80,143 @@ export function RoastCard({ data }: { data: RoastResult }) {
   }
 
   return (
-    <>
-      {/* Fullscreen toggle */}
-      <div className="flex justify-end mb-2">
-        <button
-          onClick={() => setFullscreen(true)}
-          className="font-mono text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          ⛶ fullscreen
-        </button>
-      </div>
+    <div className="w-full" style={{ maxWidth: 420, margin: '0 auto' }}>
+      {/* Card */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          backgroundColor: '#080808',
+          border: `1px solid ${hexToRgba(borderColor, 0.4)}`,
+          borderRadius: 16,
+          padding: '28px 24px',
+          boxShadow: `0 0 40px ${hexToRgba(borderColor, 0.1)}`,
+        }}
+      >
+        {/* Watermark */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
+          <span
+            className="text-white font-mono font-bold whitespace-nowrap select-none"
+            style={{
+              fontSize: '2rem',
+              opacity: 0.015,
+              transform: 'rotate(-30deg) scaleX(1.6)',
+              letterSpacing: '0.08em',
+            }}
+          >
+            getroasted.wtf &nbsp; getroasted.wtf &nbsp; getroasted.wtf
+          </span>
+        </div>
 
-      <CardDisplay data={data} />
+        <div className="relative flex flex-col">
+          {/* 1 · Rarity badge */}
+          <div
+            style={{
+              backgroundColor: hexToRgba(borderColor, 0.15),
+              border: `1px solid ${borderColor}`,
+              borderRadius: 8,
+              padding: '10px 16px',
+              marginBottom: 24,
+            }}
+          >
+            <p className="font-mono font-medium" style={{ fontSize: 14, color: borderColor }}>
+              ✦ {data.rarity} · {data.characterName} {data.characterEmoji}
+            </p>
+            <p
+              className="font-sans italic"
+              style={{ fontSize: 12, color: borderColor, opacity: 0.7, marginTop: 4 }}
+            >
+              &ldquo;{data.characterDescription}&rdquo;
+            </p>
+          </div>
+
+          {/* 2 · Cat image */}
+          {!imgError && (
+            <div className="flex flex-col items-center" style={{ marginBottom: 24 }}>
+              <Image
+                src={CAT_IMAGES[data.rarity]}
+                alt={data.characterName}
+                width={180}
+                height={180}
+                unoptimized
+                crossOrigin="anonymous"
+                onError={() => setImgError(true)}
+                style={{
+                  borderRadius: 12,
+                  border: `3px solid ${borderColor}`,
+                  objectFit: 'cover',
+                  boxShadow: `0 0 20px ${hexToRgba(borderColor, 0.3)}`,
+                }}
+              />
+              <p
+                className="font-mono"
+                style={{ fontSize: 13, color: borderColor, marginTop: 10 }}
+              >
+                {data.characterName}
+              </p>
+            </div>
+          )}
+
+          {/* 3 · Score */}
+          <div className="text-center" style={{ marginBottom: 4 }}>
+            <div
+              className="font-mono leading-none"
+              style={{ fontSize: 120, fontWeight: 800, letterSpacing: -4, color }}
+            >
+              {data.score}
+            </div>
+          </div>
+
+          {/* 4 · Exit code */}
+          <div
+            className="font-mono uppercase text-center"
+            style={{ fontSize: 13, letterSpacing: '0.2em', color, marginBottom: 32 }}
+          >
+            {code}
+          </div>
+
+          {/* 5 · Roast quote */}
+          <div className="text-center" style={{ marginBottom: 24 }}>
+            <p
+              className="font-sans italic"
+              style={{
+                fontSize: 20,
+                fontWeight: 500,
+                lineHeight: 1.5,
+                color: '#ffffff',
+                maxWidth: '85%',
+                margin: '0 auto',
+              }}
+            >
+              &ldquo;{data.roast}&rdquo;
+            </p>
+          </div>
+
+          {/* 6 · Real talk box */}
+          <div
+            style={{
+              backgroundColor: '#0d0d0d',
+              border: '1px solid #1e1e1e',
+              borderRadius: 8,
+              padding: '16px 20px',
+              marginBottom: 24,
+            }}
+          >
+            <p className="font-mono" style={{ fontSize: 11, color: '#E24B4A', marginBottom: 8 }}>
+              // real talk
+            </p>
+            <p style={{ fontSize: 14, color: '#777', lineHeight: 1.6 }}>
+              {data.stderr.replace(/\*\*/g, '')}
+            </p>
+          </div>
+
+          {/* 7 · Footer */}
+          <div className="text-center">
+            <span className="font-mono" style={{ fontSize: 11, color: '#222' }}>
+              getroasted.wtf
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Share button */}
       <button
@@ -207,57 +224,30 @@ export function RoastCard({ data }: { data: RoastResult }) {
         disabled={buttonState !== 'default'}
         className="w-full font-mono font-medium mt-4"
         style={{
-          padding: '14px 20px',
+          padding: '14px 24px',
           borderRadius: 8,
-          fontSize: 15,
-          backgroundColor: '#000',
-          border: '1.5px solid #ffffff',
+          fontSize: 14,
+          backgroundColor:
+            buttonState === 'done' ? '#639922' : '#E24B4A',
+          border: 'none',
           cursor: buttonState !== 'default' ? 'not-allowed' : 'pointer',
-          color:
-            buttonState === 'capturing'
-              ? '#a1a1aa'
-              : buttonState === 'done'
-                ? '#639922'
-                : '#ffffff',
-          transition: 'background-color 0.15s, color 0.15s',
+          color: '#ffffff',
+          opacity: buttonState === 'capturing' ? 0.6 : 1,
+          transition: 'background-color 0.15s, opacity 0.15s',
         }}
         onMouseEnter={(e) => {
-          if (buttonState === 'default') e.currentTarget.style.backgroundColor = '#111';
+          if (buttonState === 'default') e.currentTarget.style.backgroundColor = '#c73a39';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#000';
+          if (buttonState !== 'done') e.currentTarget.style.backgroundColor = '#E24B4A';
         }}
       >
         {buttonState === 'capturing'
           ? 'capturing card...'
           : buttonState === 'done'
             ? '✓ card saved — opening X...'
-            : 'share on X 𝕏'}
+            : 'share on X 𝕏 + download card'}
       </button>
-
-      {/* Fullscreen modal */}
-      {fullscreen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.95)' }}
-          onClick={() => setFullscreen(false)}
-        >
-          <div
-            className="w-full max-w-[480px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-end mb-2">
-              <button
-                onClick={() => setFullscreen(false)}
-                className="font-mono text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-              >
-                ✕ close
-              </button>
-            </div>
-            <CardDisplay data={data} />
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
