@@ -31,7 +31,7 @@ function diagnosis(score: number): string {
 // 2x — render at 1600px so it's retina-sharp when displayed at 800px
 const S = 2;
 const W = 800 * S;
-const H = 900 * S;
+const H = 780 * S;
 const PAD = 32 * S;
 
 export async function GET(
@@ -115,24 +115,19 @@ export async function GET(
           flexWrap: 'wrap',
           flexShrink: 0,
         }}>
-          <span style={{ fontSize: 22 * S, fontWeight: 900, color: '#ffffff', lineHeight: 1.4 }}>
+          <span style={{ fontSize: 36 * S, fontWeight: 900, color: '#ffffff', lineHeight: 1.3 }}>
             &ldquo;{roast.roast}&rdquo;
           </span>
         </div>
 
-        {/* spacer — pushes bottom bar down (marginTop: auto not supported by Satori) */}
-        <div style={{ flex: 1, display: 'flex' }} />
-
         {/* 6. BOTTOM BAR */}
         <div style={{
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
           padding: `${16 * S}px ${PAD}px ${24 * S}px ${PAD}px`,
           flexShrink: 0,
         }}>
           <span style={{ color: '#555', fontSize: 13 * S, fontFamily: 'monospace' }}>getroasted.wtf</span>
-          <span style={{ color: rColor, fontSize: 11 * S, fontFamily: 'monospace', letterSpacing: '0.15em' }}>{diag}</span>
         </div>
       </div>
     ),
