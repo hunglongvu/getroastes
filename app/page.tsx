@@ -64,12 +64,12 @@ function scoreColor(score: number): string {
 }
 
 export default async function HomePage() {
-  const topShame = await getHallOfShame(5);
+  const topShame = await getHallOfShame(3);
 
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* Hero */}
-      <section className="flex flex-col items-center justify-center px-4 pt-14 pb-16 text-center">
+      {/* 1 · Hero */}
+      <section id="hero" className="flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
           <span className="text-white">First the AI roasts you.</span>
           <br />
@@ -87,19 +87,19 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* Hall of Shame preview */}
-      <section className="px-4 pb-16 max-w-2xl mx-auto">
+      {/* 2 · Hall of Shame preview */}
+      <section className="border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full">
         <div className="text-center mb-5">
-          <p className="text-zinc-500 font-mono text-sm">
-            {'// hall of shame — the worst landing pages on the internet'}
+          <p className="font-mono font-bold text-lg" style={{ color: '#FFB800' }}>
+            🏆 Hall of Shame
           </p>
-          <p className="text-zinc-600 font-mono text-xs mt-1">
-            updated in real time. opt out anytime from your roast result.
+          <p className="text-zinc-500 font-mono text-xs mt-1">
+            // real roasts. real pain.
           </p>
         </div>
 
         {topShame.length === 0 ? (
-          <p className="text-zinc-600 font-mono text-sm text-center italic py-8">
+          <p className="text-zinc-600 font-mono text-xs text-center py-6">
             // no victims yet. be the first.
           </p>
         ) : (
@@ -116,45 +116,26 @@ export default async function HomePage() {
                 <div
                   key={roast.id}
                   className="flex items-center gap-3 rounded-lg px-4 py-3"
-                  style={{
-                    backgroundColor: '#080808',
-                    border: '1px solid #1a1a1a',
-                  }}
+                  style={{ backgroundColor: '#080808', border: '1px solid #1a1a1a' }}
                 >
-                  {/* Rank */}
-                  <span className="font-mono text-xs w-6 flex-none font-bold" style={{
-                    color: i === 0 ? '#FFB800' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : '#52525b',
-                  }}>
+                  <span
+                    className="font-mono text-xs w-6 flex-none font-bold"
+                    style={{ color: i === 0 ? '#FFB800' : i === 1 ? '#C0C0C0' : '#CD7F32' }}
+                  >
                     #{i + 1}
                   </span>
-
-                  {/* Emoji + rarity */}
-                  <span
-                    className="font-mono text-xs flex-none"
-                    style={{ color: rarityStyle.border }}
-                  >
+                  <span className="font-mono text-xs flex-none" style={{ color: rarityStyle.border }}>
                     {roast.characterEmoji}
                   </span>
-
-                  {/* Domain */}
                   <span className="font-mono text-white text-xs flex-none max-w-[100px] truncate">
                     {roast.domain}
                   </span>
-
-                  {/* Score */}
-                  <span
-                    className="font-mono text-xs font-bold flex-none"
-                    style={{ color }}
-                  >
+                  <span className="font-mono text-xs font-bold flex-none" style={{ color }}>
                     {roast.score}/100
                   </span>
-
-                  {/* Roast snippet */}
                   <span className="font-mono text-zinc-400 text-xs flex-1 min-w-0 truncate hidden sm:block">
                     &ldquo;{snippet}&rdquo;
                   </span>
-
-                  {/* View link */}
                   <Link
                     href={`/roast/${roast.id}`}
                     className="font-mono text-zinc-600 text-xs flex-none hover:text-white transition-colors"
@@ -167,7 +148,7 @@ export default async function HomePage() {
           </div>
         )}
 
-        <div className="text-center mt-6">
+        <div className="text-center mt-5">
           <Link
             href="/hall-of-shame"
             className="font-mono text-zinc-500 text-xs hover:text-zinc-300 transition-colors"
@@ -177,8 +158,49 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Rarity showcase */}
-      <section className="pb-20">
+      {/* 3 · Rarity badge pills */}
+      <section className="border-t border-zinc-900 py-12 px-4">
+        <p className="text-zinc-500 font-mono text-xs text-center mb-4">
+          // what card will you get?
+        </p>
+
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 justify-center pb-1" style={{ width: 'max-content', margin: '0 auto' }}>
+            {RARITY_CARDS.map((card) => (
+              <span
+                key={card.rarity}
+                className="font-mono text-xs whitespace-nowrap"
+                style={{
+                  backgroundColor: '#080808',
+                  border: `1px solid ${card.color}`,
+                  color: card.color,
+                  padding: '4px 12px',
+                  borderRadius: 99,
+                }}
+              >
+                {card.emoji} {card.rarity}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-zinc-600 font-mono text-xs text-center mt-4">
+          lower score = rarer card. chase the 404 Cat.
+        </p>
+
+        <div className="text-center mt-5">
+          <a
+            href="#hero"
+            className="font-mono text-xs font-medium px-5 py-2 rounded-lg transition-colors"
+            style={{ backgroundColor: '#E24B4A', color: '#fff' }}
+          >
+            Roast it →
+          </a>
+        </div>
+      </section>
+
+      {/* 4 · Full rarity showcase */}
+      <section className="border-t border-zinc-900 py-12 pb-20">
         <div className="text-center mb-4 px-4">
           <p className="text-zinc-400 font-mono text-sm">
             {'// rarity system — what card will you get?'}
@@ -188,12 +210,10 @@ export default async function HomePage() {
           </p>
         </div>
 
-        {/* Mobile scroll hint */}
         <p className="text-zinc-700 font-mono text-xs text-center mb-4 sm:hidden">
           ← scroll →
         </p>
 
-        {/* Cards row */}
         <div className="overflow-x-auto scrollbar-hide">
           <div
             className="flex gap-4 pb-2"
