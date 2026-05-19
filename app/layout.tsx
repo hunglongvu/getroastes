@@ -13,9 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "getroasted.wtf — AI Landing Page Roaster",
-  description:
-    "Paste your SaaS landing page URL. Get ruthlessly roasted by AI. No fluff, just brutal technical truth.",
+  title: 'getroasted.wtf — AI Landing Page Roaster',
+  description: 'Paste your landing page URL. Get brutally roasted by AI. Share on X. Go viral.',
+  openGraph: {
+    title: 'getroasted.wtf — AI Landing Page Roaster',
+    description: 'First the AI roasts you. Then the internet does.',
+    url: 'https://getroasted.wtf',
+    siteName: 'getroasted.wtf',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'getroasted.wtf',
+    description: 'First the AI roasts you. Then the internet does.',
+    images: ['/opengraph-image'],
+  },
 };
 
 export default function RootLayout({
