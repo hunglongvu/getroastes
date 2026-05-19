@@ -41,7 +41,16 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-black">{children}</body>
+      <body className="min-h-full flex flex-col bg-black">
+        {children}
+        <footer style={{ textAlign: 'center', padding: '20px', borderTop: '1px solid #111' }}>
+          <span className="font-mono text-xs" style={{ color: '#333' }}>
+            <a href="/impressum" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Impressum</a>
+            {' · '}
+            <a href="/datenschutz" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Datenschutz</a>
+          </span>
+        </footer>
+      </body>
     </html>
   );
 }
