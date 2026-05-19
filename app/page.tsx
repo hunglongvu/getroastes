@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
 import { Embers } from './components/Embers';
