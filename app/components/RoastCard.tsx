@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import type { RoastResult } from '@/lib/types';
 import type { Rarity } from '@/lib/rarity';
@@ -44,14 +44,15 @@ export function RoastCard({ data }: { data: RoastResult }) {
   const code = exitCode(data.score);
   const rarityStyle = RARITY_STYLES[data.rarity];
   const borderColor = rarityStyle.border;
+  const shortRoast = data.roast.length > 60 ? data.roast.slice(0, 57) + '...' : data.roast;
 
   async function handleShareAndDownload() {
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    const shortRoast = data.roast.length > 80 ? data.roast.slice(0, 77) + '...' : data.roast;
+    const tweetRoast = data.roast.length > 80 ? data.roast.slice(0, 77) + '...' : data.roast;
     const tweetText = encodeURIComponent(
-      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${shortRoast}"\n\n📎 attach pic for full roast\n\ngetroasted.wtf`
+      `just got my landing page roasted by AI 💀\n\n${data.domain} scored ${data.score}/100\n${exitCode(data.score)}\n\n"${tweetRoast}"\n\n📎 attach pic for full roast\n\ngetroasted.wtf`
     );
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
@@ -74,29 +75,33 @@ export function RoastCard({ data }: { data: RoastResult }) {
       setTimeout(() => setButtonState('default'), 3000);
     } catch (err) {
       console.error('Download failed:', err);
-      alert('Download error: ' + String(err));
       setButtonState('default');
       window.open(tweetUrl, '_blank');
     }
   }
 
   return (
-    <div className="w-full" style={{ maxWidth: 420, margin: '0 auto' }}>
-      {/* Card */}
+    <div className="w-full">
+      {/* 1:1 meme card */}
       <div
         className="relative overflow-hidden"
         style={{
+          aspectRatio: '1 / 1',
           backgroundColor: '#080808',
           border: `1px solid ${hexToRgba(borderColor, 0.4)}`,
           borderRadius: 16,
-          padding: '28px 24px',
           boxShadow: `0 0 40px ${hexToRgba(borderColor, 0.1)}`,
+          padding: 24,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         {/* Watermark */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
           <span
-            className="text-white font-mono font-bold whitespace-nowrap select-none"
+            className="font-mono font-bold whitespace-nowrap select-none text-white"
             style={{
               fontSize: '2rem',
               opacity: 0.015,
@@ -108,118 +113,66 @@ export function RoastCard({ data }: { data: RoastResult }) {
           </span>
         </div>
 
-        <div className="relative flex flex-col">
-          {/* 1 · Rarity badge */}
-          <div
-            style={{
-              backgroundColor: hexToRgba(borderColor, 0.2),
-              border: `1.5px solid ${borderColor}`,
-              borderRadius: 8,
-              padding: '14px 18px',
-              marginBottom: 24,
-              width: '100%',
-            }}
-          >
-            <p className="font-mono font-bold" style={{ fontSize: 18, color: borderColor }}>
-              ✦ {data.rarity}
-            </p>
-            <p className="font-mono" style={{ fontSize: 15, color: borderColor, marginTop: 2 }}>
-              {data.characterName} {data.characterEmoji}
-            </p>
-            <p
-              className="font-sans italic"
-              style={{ fontSize: 12, color: borderColor, opacity: 0.7, marginTop: 6 }}
-            >
-              &ldquo;{data.characterDescription}&rdquo;
-            </p>
-          </div>
+        {/* Rarity + character */}
+        <div className="relative text-center w-full">
+          <p className="font-mono" style={{ fontSize: 12, color: borderColor }}>
+            ✦ {data.rarity}
+          </p>
+          <p className="font-mono" style={{ fontSize: 13, color: borderColor }}>
+            {data.characterName} {data.characterEmoji}
+          </p>
+        </div>
 
-          {/* 2 · Cat image */}
-          {!imgError && (
-            <div className="flex flex-col items-center" style={{ marginBottom: 24 }}>
-              <Image
-                src={CAT_IMAGES[data.rarity]}
-                alt={data.characterName}
-                width={180}
-                height={180}
-                unoptimized
-                crossOrigin="anonymous"
-                onError={() => setImgError(true)}
-                style={{
-                  borderRadius: 12,
-                  border: `3px solid ${borderColor}`,
-                  objectFit: 'cover',
-                  boxShadow: `0 0 20px ${hexToRgba(borderColor, 0.3)}`,
-                }}
-              />
-              <p
-                className="font-mono"
-                style={{ fontSize: 13, color: borderColor, marginTop: 10 }}
-              >
-                {data.characterName}
-              </p>
-            </div>
+        {/* Cat image */}
+        <div className="relative flex justify-center">
+          {!imgError ? (
+            <Image
+              src={CAT_IMAGES[data.rarity]}
+              alt={data.characterName}
+              width={100}
+              height={100}
+              unoptimized
+              crossOrigin="anonymous"
+              onError={() => setImgError(true)}
+              style={{
+                borderRadius: 8,
+                border: `2px solid ${borderColor}`,
+                objectFit: 'cover',
+              }}
+            />
+          ) : (
+            <div style={{ width: 100, height: 100 }} />
           )}
+        </div>
 
-          {/* 3 · Score */}
-          <div className="text-center" style={{ marginBottom: 4 }}>
-            <div
-              className="font-mono leading-none"
-              style={{ fontSize: 120, fontWeight: 800, letterSpacing: -4, color }}
-            >
-              {data.score}
-            </div>
-          </div>
-
-          {/* 4 · Exit code */}
+        {/* Score */}
+        <div className="relative text-center">
           <div
-            className="font-mono uppercase text-center"
-            style={{ fontSize: 12, letterSpacing: '0.2em', color, marginBottom: 0 }}
+            className="font-mono leading-none"
+            style={{ fontSize: 72, fontWeight: 800, color, letterSpacing: -3 }}
+          >
+            {data.score}
+          </div>
+          <div
+            className="font-mono uppercase"
+            style={{ fontSize: 10, letterSpacing: '0.2em', color, marginTop: 4 }}
           >
             {code}
           </div>
+        </div>
 
-          {/* 5 · Roast quote */}
-          <div className="text-center" style={{ marginTop: 24, marginBottom: 24 }}>
-            <p
-              className="font-sans"
-              style={{
-                fontSize: 28,
-                fontWeight: 700,
-                lineHeight: 1.35,
-                color: '#ffffff',
-                maxWidth: '95%',
-                margin: '0 auto',
-              }}
-            >
-              &ldquo;{data.roast}&rdquo;
-            </p>
-          </div>
+        {/* Roast quote */}
+        <div className="relative text-center" style={{ padding: '0 8px' }}>
+          <p className="font-sans italic" style={{ fontSize: 14, color: '#ffffff', lineHeight: 1.4 }}>
+            &ldquo;{shortRoast}&rdquo;
+          </p>
+        </div>
 
-          {/* 6 · Real talk box */}
-          <div
-            style={{
-              backgroundColor: '#0d0d0d',
-              border: '1px solid #1e1e1e',
-              borderRadius: 8,
-              padding: '16px 20px',
-              marginBottom: 24,
-            }}
-          >
-            <p className="font-mono" style={{ fontSize: 11, color: '#E24B4A', marginBottom: 8 }}>
-              // real talk
-            </p>
-            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.55 }}>
-              {data.stderr.replace(/\*\*/g, '')}
-            </p>
-          </div>
-
-          {/* 7 · Footer */}
-          <div className="text-center">
-            <span className="font-mono" style={{ fontSize: 11, color: '#222' }}>
-              getroasted.wtf
-            </span>
-          </div>
+        {/* Footer */}
+        <div className="relative text-center">
+          <span className="font-mono" style={{ fontSize: 10, color: '#333' }}>
+            getroasted.wtf
+          </span>
         </div>
       </div>
 
@@ -227,13 +180,13 @@ export function RoastCard({ data }: { data: RoastResult }) {
       <button
         onClick={handleShareAndDownload}
         disabled={buttonState !== 'default'}
-        className="w-full font-mono font-medium mt-4"
+        className="w-full font-mono font-medium"
         style={{
-          padding: '14px 24px',
+          marginTop: 12,
+          padding: '14px',
           borderRadius: 8,
           fontSize: 14,
-          backgroundColor:
-            buttonState === 'done' ? '#639922' : '#E24B4A',
+          backgroundColor: buttonState === 'done' ? '#639922' : '#E24B4A',
           border: 'none',
           cursor: buttonState !== 'default' ? 'not-allowed' : 'pointer',
           color: '#ffffff',
@@ -253,6 +206,11 @@ export function RoastCard({ data }: { data: RoastResult }) {
             ? '✓ card saved — opening X...'
             : 'share on X 𝕏 + download card'}
       </button>
+
+      {/* Helper text */}
+      <p className="font-mono text-xs text-zinc-600 text-center" style={{ marginTop: 8 }}>
+        // card downloads automatically · attach to tweet
+      </p>
     </div>
   );
 }
