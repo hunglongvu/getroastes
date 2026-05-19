@@ -125,27 +125,46 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
           </div>
         </div>
 
-        {/* CAT IMAGE — 70% of the card */}
-        <div style={{ height: 200, width: '100%', overflow: 'hidden', position: 'relative' }}>
+        {/* ILLUSTRATION — screenshot background + cat foreground */}
+        <div style={{ height: 220, width: '100%', overflow: 'hidden', position: 'relative', backgroundColor: '#0d0d0d' }}>
+          {/* Layer 1: screenshot background */}
+          {data.screenshotBase64 && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`data:image/jpeg;base64,${data.screenshotBase64}`}
+              alt=""
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover', objectPosition: 'top',
+                opacity: 0.5,
+              }}
+            />
+          )}
+          {/* Layer 2: gradient overlay */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(8,8,8,0.6))',
+            pointerEvents: 'none',
+          }} />
+          {/* Layer 3: cat foreground */}
           {!imgError ? (
             <Image
               src={CAT_IMAGES[data.rarity]}
               alt={data.characterName}
-              fill
+              width={140}
+              height={160}
               unoptimized
               crossOrigin="anonymous"
               onError={() => setImgError(true)}
-              style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              style={{
+                position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                objectFit: 'cover', objectPosition: 'top',
+                borderRadius: '8px 8px 0 0',
+                filter: 'drop-shadow(0 -4px 20px rgba(0,0,0,0.8))',
+              }}
             />
-          ) : (
-            <div style={{ width: '100%', height: '100%', backgroundColor: '#111' }} />
-          )}
-          {/* Bottom fade */}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
-            background: 'linear-gradient(transparent, #080808)',
-            pointerEvents: 'none',
-          }} />
+          ) : null}
         </div>
 
         {/* MOVE BAR */}
