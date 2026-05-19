@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 
 function pick<T>(arr: T[], n: number): T[] {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
@@ -131,10 +132,10 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
       ? lineColor(lines[lineIdxRef.current])
       : '#639922';
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
-      style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.15s' }}
+      className="fixed inset-0 bg-black flex items-center justify-center"
+      style={{ zIndex: 99999, opacity: visible ? 1 : 0, transition: 'opacity 0.15s' }}
     >
       {/* Terminal window */}
       <div
@@ -215,6 +216,7 @@ export function TerminalAnimation({ domain, apiReady, onDone }: Props) {
           50% { opacity: 0; }
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
