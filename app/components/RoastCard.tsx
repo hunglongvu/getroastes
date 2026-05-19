@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { RoastResult } from '@/lib/types';
 import { RARITY_STYLES } from '@/lib/rarity';
 
@@ -27,8 +28,76 @@ function diagnosis(score: number): string {
   return 'ALIVE ON CRUNCHBASE, NOWHERE ELSE';
 }
 
+function ShareModal({ tweetUrl, onClose }: { tweetUrl: string; onClose: () => void }) {
+  function openTweet() {
+    window.open(tweetUrl, '_blank');
+    onClose();
+  }
+
+  return createPortal(
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 99999,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        backdropFilter: 'blur(4px)',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: '#111',
+          border: '1px solid #222',
+          borderRadius: 12,
+          padding: 40,
+          maxWidth: 420,
+          width: '90%',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: '0 0 8px' }}>
+          card downloaded 🔥
+        </p>
+        <p style={{ fontFamily: 'monospace', fontSize: 13, color: '#ff4444', margin: '0 0 16px' }}>
+          // don&apos;t forget to attach the image
+        </p>
+        <p style={{ fontSize: 15, color: '#888', lineHeight: 1.6, margin: '0 0 28px' }}>
+          attach the downloaded card to your tweet so people can see exactly how cooked you are.
+        </p>
+
+        <button
+          onClick={openTweet}
+          style={{
+            width: '100%', padding: 14, borderRadius: 8,
+            backgroundColor: '#ff4444', color: '#ffffff',
+            fontSize: 15, fontWeight: 600, border: 'none',
+            cursor: 'pointer', marginBottom: 12,
+            fontFamily: 'monospace',
+          }}
+        >
+          continue to X →
+        </button>
+
+        <button
+          onClick={openTweet}
+          style={{
+            width: '100%', background: 'none', border: 'none',
+            color: '#444', fontSize: 14, cursor: 'pointer',
+            fontFamily: 'monospace', padding: '6px 0',
+          }}
+        >
+          skip
+        </button>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) {
   const [buttonState, setButtonState] = useState<'default' | 'capturing' | 'done'>('default');
+  const [showModal, setShowModal] = useState(false);
+  const [tweetUrl, setTweetUrl] = useState('');
 
   const sColor = survivalColor(data.score);
   const rarityStyle = RARITY_STYLES[data.rarity];
@@ -39,41 +108,46 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
+    const tweetText = encodeURIComponent(
+      `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n"${data.roast}"\n\ngetroasted.wtf 🔥`
+    );
+    const url = `https://twitter.com/intent/tweet?text=${tweetText}`;
+
     try {
       const response = await fetch(`/api/card-image/${data.id}`);
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const objectUrl = window.URL.createObjectURL(blob);
 
       const link = document.createElement('a');
       link.style.display = 'none';
-      link.href = url;
+      link.href = objectUrl;
       link.download = `roast-${data.domain}.png`;
       document.body.appendChild(link);
       link.click();
 
       setTimeout(() => {
-        window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(objectUrl);
         document.body.removeChild(link);
       }, 100);
-
-      setButtonState('done');
     } catch (err) {
       console.error('Download failed:', err);
       window.open(`/api/card-image/${data.id}`, '_blank');
-      setButtonState('done');
     }
 
-    setTimeout(() => {
-      const tweetText = encodeURIComponent(
-        `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n"${data.roast}"\n\ngetroasted.wtf 🔥`
-      );
-      window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
-      setTimeout(() => setButtonState('default'), 2000);
-    }, 1500);
+    setButtonState('done');
+    setTweetUrl(url);
+    setShowModal(true);
+  }
+
+  function handleModalClose() {
+    setShowModal(false);
+    setTimeout(() => setButtonState('default'), 300);
   }
 
   return (
     <div className="w-full" style={{ maxWidth: 340 }}>
+      {showModal && <ShareModal tweetUrl={tweetUrl} onClose={handleModalClose} />}
+
       {/* Meme card */}
       <div
         id="roast-card"
@@ -165,7 +239,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
         {buttonState === 'capturing'
           ? 'capturing card...'
           : buttonState === 'done'
-            ? '✓ saved! opening X...'
+            ? '✓ saved!'
             : 'share on X 𝕏 + download card'}
       </button>
 
