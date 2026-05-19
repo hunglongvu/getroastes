@@ -45,9 +45,9 @@ export default function RootLayout({
         {children}
         <footer style={{ textAlign: 'center', padding: '20px', borderTop: '1px solid #111' }}>
           <span className="font-mono text-xs" style={{ color: '#333' }}>
-            <a href="/impressum" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Impressum</a>
+            <a href="/imprint" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Imprint</a>
             {' · '}
-            <a href="/datenschutz" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Datenschutz</a>
+            <a href="/privacy" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Privacy Policy</a>
           </span>
         </footer>
       </body>
