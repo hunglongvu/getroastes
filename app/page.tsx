@@ -69,18 +69,14 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero */}
-      <section className="flex flex-col items-center justify-center px-4 pt-24 pb-16 text-center">
-        <div className="font-mono text-zinc-500 text-xs mb-5 tracking-widest uppercase">
-          v2.0.0 — open beta
-        </div>
-
+      <section className="flex flex-col items-center justify-center px-4 pt-14 pb-16 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
           <span className="text-white">First the AI roasts you.</span>
           <br />
           <span className="text-[#E24B4A]">Then the internet does.</span>
         </h1>
 
-        <p className="text-zinc-400 font-mono text-lg sm:text-xl mb-12 max-w-lg">
+        <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 whitespace-nowrap">
           Paste URL. Get roasted. Share on X. Go viral.
         </p>
 
@@ -168,6 +164,10 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+
+        <p className="md:hidden text-zinc-600 font-mono text-xs text-center mt-3">
+          scroll to see all rarities →
+        </p>
 
         <p className="text-zinc-600 font-mono text-xs text-center mt-8 px-4">
           $ roast --your-page to find out which cat you deserve
