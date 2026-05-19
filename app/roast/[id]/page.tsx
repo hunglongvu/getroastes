@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getRoast } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
 import { RoastCard } from '@/app/components/RoastCard';
+import { Embers } from '@/app/components/Embers';
 import { RARITY_STYLES } from '@/lib/rarity';
 import type { Rarity } from '@/lib/rarity';
 
@@ -30,13 +31,6 @@ function exitCode(score: number): string {
   return 'merge approved';
 }
 
-function hexToRgba(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
 export default async function RoastPage({
   params,
 }: {
@@ -46,15 +40,9 @@ export default async function RoastPage({
   const roast = await getRoast(id);
   if (!roast) notFound();
 
-  // Fetch rank data server-side
   const [{ count: worseCount }, { count: total }] = await Promise.all([
-    supabase
-      .from('roasts')
-      .select('*', { count: 'exact', head: true })
-      .lt('score', roast.score),
-    supabase
-      .from('roasts')
-      .select('*', { count: 'exact', head: true }),
+    supabase.from('roasts').select('*', { count: 'exact', head: true }).lt('score', roast.score),
+    supabase.from('roasts').select('*', { count: 'exact', head: true }),
   ]);
 
   const rank = (total ?? 0) - (worseCount ?? 0);
@@ -66,8 +54,28 @@ export default async function RoastPage({
   const code = exitCode(roast.score);
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 24px' }}>
+    <main
+      className="relative min-h-screen text-white"
+      style={{ background: 'radial-gradient(ellipse at top, #0f0000 0%, #000000 60%)' }}
+    >
+      <Embers />
+
+      {/* Rarity glow — top left */}
+      <div style={{
+        position: 'fixed', top: -300, left: -300,
+        width: 700, height: 700, borderRadius: '50%',
+        background: `radial-gradient(circle, ${borderColor}20 0%, transparent 65%)`,
+        pointerEvents: 'none', zIndex: 0,
+      }} />
+      {/* Rarity glow — bottom right */}
+      <div style={{
+        position: 'fixed', bottom: -200, right: -200,
+        width: 500, height: 500, borderRadius: '50%',
+        background: `radial-gradient(circle, ${borderColor}12 0%, transparent 65%)`,
+        pointerEvents: 'none', zIndex: 0,
+      }} />
+
+      <div className="relative" style={{ zIndex: 1, maxWidth: 1000, margin: '0 auto', padding: '40px 24px' }}>
 
         {/* Top bar */}
         <div className="flex items-center justify-between mb-10">
@@ -96,77 +104,79 @@ export default async function RoastPage({
           {/* RIGHT COLUMN — stats */}
           <div className="flex-1 flex flex-col gap-7">
 
-            {/* Section 1: Rarity + cat compact */}
-            <div>
-              <div className="flex items-start gap-4" style={{ marginBottom: 10 }}>
-                <Image
-                  src={CAT_IMAGES[roast.rarity]}
-                  alt={roast.characterName}
-                  width={80}
-                  height={80}
-                  unoptimized
-                  style={{
-                    borderRadius: 10,
-                    border: `2px solid ${borderColor}`,
-                    objectFit: 'cover',
-                    flexShrink: 0,
-                  }}
-                />
-                <div>
-                  <p className="font-mono font-medium" style={{ fontSize: 14, color: borderColor }}>
-                    ✦ {roast.rarity} · {roast.characterName} {roast.characterEmoji}
-                  </p>
-                  <p
-                    className="font-sans italic"
-                    style={{ fontSize: 13, color: borderColor, opacity: 0.6, marginTop: 4, lineHeight: 1.4 }}
-                  >
-                    &ldquo;{roast.characterDescription}&rdquo;
-                  </p>
-                </div>
+            {/* Rarity + cat */}
+            <div className="flex items-start gap-4">
+              <Image
+                src={CAT_IMAGES[roast.rarity]}
+                alt={roast.characterName}
+                width={80}
+                height={80}
+                unoptimized
+                style={{ borderRadius: 10, border: `2px solid ${borderColor}`, objectFit: 'cover', flexShrink: 0 }}
+              />
+              <div>
+                <p className="font-mono font-medium" style={{ fontSize: 14, color: borderColor }}>
+                  ✦ {roast.rarity} · {roast.characterName} {roast.characterEmoji}
+                </p>
+                <p className="font-sans italic" style={{ fontSize: 13, color: borderColor, opacity: 0.6, marginTop: 4, lineHeight: 1.4 }}>
+                  &ldquo;{roast.characterDescription}&rdquo;
+                </p>
               </div>
             </div>
 
-            {/* Section 2: Score + exit code + roast quote */}
-            <div>
+            {/* Score + exit code + roast quote */}
+            <div className="fade-in">
               <div
                 className="font-mono leading-none"
-                style={{ fontSize: 96, fontWeight: 800, color, letterSpacing: -4 }}
+                style={{
+                  fontSize: 160, fontWeight: 900, color,
+                  letterSpacing: -8, lineHeight: 1, marginBottom: 8,
+                  textShadow: `0 0 60px ${color}60, 0 0 120px ${color}30`,
+                }}
               >
                 {roast.score}
               </div>
               <div
                 className="font-mono uppercase"
-                style={{ fontSize: 12, letterSpacing: '0.2em', color, marginTop: 6, marginBottom: 16 }}
+                style={{ fontSize: 12, letterSpacing: '0.2em', color, marginBottom: 20 }}
               >
                 {code}
               </div>
+            </div>
+
+            <div className="fade-in-delay-1">
               <p
                 className="font-sans"
-                style={{ fontSize: 22, fontWeight: 600, color: '#ffffff', lineHeight: 1.4 }}
+                style={{
+                  fontSize: 28, fontWeight: 700, color: '#ffffff', lineHeight: 1.35,
+                  borderLeft: `3px solid ${borderColor}`, paddingLeft: 20,
+                }}
               >
                 &ldquo;{roast.roast}&rdquo;
               </p>
             </div>
 
-            {/* Section 3: Real talk */}
+            {/* Real talk */}
             <div
+              className="fade-in-delay-2"
               style={{
                 backgroundColor: '#0d0d0d',
-                border: '1px solid #1e1e1e',
+                border: '1px solid #2a2a2a',
                 borderRadius: 10,
-                padding: '20px 24px',
+                padding: '24px 28px',
               }}
             >
-              <p className="font-mono" style={{ fontSize: 12, color: '#E24B4A', marginBottom: 10 }}>
+              <p className="font-mono" style={{ fontSize: 13, color: '#E24B4A', marginBottom: 10 }}>
                 // real talk
               </p>
-              <p style={{ fontSize: 15, color: '#888', lineHeight: 1.75 }}>
+              <p style={{ fontSize: 16, color: '#999', lineHeight: 1.8 }}>
                 {roast.stderr.replace(/\*\*/g, '')}
               </p>
             </div>
 
-            {/* Section 4: Hall of Shame rank */}
+            {/* Hall of Shame rank */}
             <div
+              className="fade-in-delay-3"
               style={{
                 backgroundColor: '#0d0d0d',
                 border: '1px solid #FFB800',
@@ -180,26 +190,28 @@ export default async function RoastPage({
 
               {rank != null && total ? (
                 <>
-                  <div style={{ fontSize: 36, fontWeight: 700, color: '#FFB800', lineHeight: 1 }}>
-                    #{rank}
-                    <span className="font-mono text-zinc-500" style={{ fontSize: 13, fontWeight: 400, marginLeft: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+                    <span style={{ fontSize: 56, fontWeight: 900, color: '#FFB800', lineHeight: 1 }}>
+                      #{rank}
+                    </span>
+                    <span className="font-mono text-zinc-400" style={{ fontSize: 16 }}>
                       on Hall of Shame
                     </span>
                   </div>
-                  <p className="font-mono" style={{ fontSize: 13, color: '#52525b', marginTop: 4, marginBottom: 12 }}>
+                  <p className="font-mono" style={{ fontSize: 13, color: '#52525b', marginBottom: 12 }}>
                     out of {total.toLocaleString()} roasted pages
                   </p>
 
                   {roast.score < 30 ? (
-                    <p className="font-mono" style={{ fontSize: 13, color: '#E24B4A' }}>
+                    <p className="font-mono" style={{ fontSize: 15, color: '#E24B4A' }}>
                       🔥 top {100 - percentileCooked}% most cooked pages ever
                     </p>
                   ) : roast.score < 50 ? (
-                    <p className="font-mono" style={{ fontSize: 13, color: '#EF9F27' }}>
+                    <p className="font-mono" style={{ fontSize: 15, color: '#EF9F27' }}>
                       your page is worse than {percentileCooked}% of all roasts
                     </p>
                   ) : (
-                    <p className="font-mono" style={{ fontSize: 13, color: '#52525b' }}>
+                    <p className="font-mono" style={{ fontSize: 15, color: '#52525b' }}>
                       not the worst we&apos;ve seen. barely.
                     </p>
                   )}
