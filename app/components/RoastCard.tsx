@@ -138,7 +138,7 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
         </div>
 
         {/* CAT IMAGE — 70% of the card */}
-        <div style={{ height: 280, width: '100%', overflow: 'hidden', position: 'relative' }}>
+        <div style={{ height: 200, width: '100%', overflow: 'hidden', position: 'relative' }}>
           {!imgError ? (
             <Image
               src={CAT_IMAGES[data.rarity]}
