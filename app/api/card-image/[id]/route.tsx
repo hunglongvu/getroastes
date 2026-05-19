@@ -87,12 +87,13 @@ export async function GET(
         )}
 
         {/* 3. SCORE BLOCK */}
-        <div style={{ display: 'flex', flexDirection: 'column', padding: `40px ${PAD}px 0 ${PAD}px` }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, padding: `40px ${PAD}px 0 ${PAD}px` }}>
           <div style={{ fontSize: 180, fontWeight: 900, letterSpacing: -8, lineHeight: 1, color: sColor, display: 'flex' }}>
             {roast.score}%
           </div>
-          <div style={{ fontSize: 20, letterSpacing: '0.3em', color: '#999', marginTop: 8, display: 'flex', fontFamily: 'monospace', fontWeight: 700 }}>
-            COOKED SCORE
+          <div style={{ display: 'flex', flexDirection: 'column', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: '#999', letterSpacing: '0.2em', lineHeight: 1.3 }}>
+            <span>COOKED</span>
+            <span>SCORE</span>
           </div>
         </div>
 
