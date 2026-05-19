@@ -53,7 +53,7 @@ export async function GET(
     (
       <div
         style={{
-          background: '#080808',
+          background: '#111111',
           width: `${W}px`,
           height: `${H}px`,
           display: 'flex',
@@ -77,21 +77,28 @@ export async function GET(
           </span>
         </div>
 
-        {/* 2. SCREENSHOT — full bleed */}
-        {screenshotSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={screenshotSrc}
-            alt={roast.domain}
-            width={W}
-            height={220 * S}
-            style={{ objectFit: 'cover', objectPosition: 'top', flexShrink: 0 }}
-          />
-        ) : (
-          <div style={{ width: W, height: 220 * S, background: '#111', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#333', fontSize: 12 * S }}>no screenshot</span>
-          </div>
-        )}
+        {/* 2. SCREENSHOT — padded + bordered */}
+        <div style={{ padding: `0 ${PAD}px`, flexShrink: 0, display: 'flex' }}>
+          {screenshotSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={screenshotSrc}
+              alt={roast.domain}
+              width={W - PAD * 2}
+              height={220 * S}
+              style={{
+                objectFit: 'cover',
+                objectPosition: 'top',
+                borderRadius: 6 * S,
+                border: `${2 * S}px solid ${rColor}`,
+              }}
+            />
+          ) : (
+            <div style={{ width: W - PAD * 2, height: 220 * S, background: '#1a1a1a', borderRadius: 6 * S, border: `${2 * S}px solid ${rColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#333', fontSize: 12 * S }}>no screenshot</span>
+            </div>
+          )}
+        </div>
 
         {/* 3. SCORE BLOCK — centered */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${32 * S}px ${PAD}px 0 ${PAD}px`, flexShrink: 0 }}>
