@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
+import { FloatingRoasts } from './components/FloatingRoasts';
 import { getHallOfShame } from '@/lib/store';
 import { RARITY_STYLES } from '@/lib/rarity';
 
@@ -67,9 +68,11 @@ export default async function HomePage() {
   const topShame = await getHallOfShame(3);
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="relative min-h-screen bg-black text-white">
+      <FloatingRoasts />
+
       {/* 1 · Hero */}
-      <section id="hero" className="flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
+      <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
           <span className="text-white">First the AI roasts you.</span>
           <br />
@@ -88,7 +91,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2 · Hall of Shame preview */}
-      <section className="border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full">
+      <section className="relative z-10 border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full">
         <div className="text-center mb-5">
           <p className="font-mono font-bold text-lg" style={{ color: '#FFB800' }}>
             🏆 Hall of Shame
@@ -159,7 +162,7 @@ export default async function HomePage() {
       </section>
 
       {/* 3 · Rarity badge pills */}
-      <section className="border-t border-zinc-900 py-12 px-4">
+      <section className="relative z-10 border-t border-zinc-900 py-12 px-4">
         <p className="text-zinc-500 font-mono text-xs text-center mb-4">
           // what card will you get?
         </p>
@@ -200,7 +203,7 @@ export default async function HomePage() {
       </section>
 
       {/* 4 · Full rarity showcase */}
-      <section className="border-t border-zinc-900 py-12 pb-20">
+      <section className="relative z-10 border-t border-zinc-900 py-12 pb-20">
         <div className="text-center mb-4 px-4">
           <p className="text-zinc-400 font-mono text-sm">
             {'// rarity system — what card will you get?'}
