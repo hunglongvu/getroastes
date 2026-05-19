@@ -84,6 +84,32 @@ export async function getHallOfShame(limit = 20): Promise<RoastResult[]> {
   }));
 }
 
+export async function getRecentRoasts(limit = 5): Promise<RoastResult[]> {
+  const { data } = await supabase
+    .from('roasts')
+    .select('*')
+    .eq('excluded', false)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (!data) return [];
+
+  return data.map((d) => ({
+    id: d.id,
+    domain: d.domain,
+    url: d.url,
+    score: d.score,
+    rarity: d.rarity,
+    characterName: d.character_name,
+    characterEmoji: d.character_emoji,
+    characterDescription: d.character_description,
+    roast: d.roast,
+    stderr: d.stderr,
+    tags: d.tags,
+    createdAt: new Date(d.created_at).getTime(),
+  }));
+}
+
 export async function excludeFromLeaderboard(id: string): Promise<void> {
   await supabase.from('roasts').update({ excluded: true }).eq('id', id);
 }
