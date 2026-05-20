@@ -34,9 +34,11 @@ export async function GET(
   const [roast, fontData] = await Promise.all([getRoast(id), loadInterBlack()]);
   if (!roast) return new Response('Not found', { status: 404 });
 
-  const screenshotSrc = roast.screenshotBase64
-    ? `data:image/jpeg;base64,${roast.screenshotBase64}`
-    : null;
+  // Skip screenshot if base64 is too large — Satori crashes mid-stream on big images
+  const screenshotSrc =
+    roast.screenshotBase64 && roast.screenshotBase64.length < 200 * 1024
+      ? `data:image/jpeg;base64,${roast.screenshotBase64}`
+      : null;
 
   const fonts = fontData
     ? [{ name: 'Inter', data: fontData, weight: 900 as const, style: 'normal' as const }]
@@ -67,7 +69,6 @@ export async function GET(
               top: 0,
               left: 0,
               objectFit: 'cover',
-              objectPosition: 'top',
               display: 'flex',
             }}
           />

@@ -5,15 +5,15 @@ export async function takeScreenshot(
     access_key: process.env.SCREENSHOTONE_API_KEY!,
     url,
     format: 'jpg',
-    viewport_width: '1400',
-    viewport_height: '1200',
+    viewport_width: '800',
+    viewport_height: '900',
     full_page: 'false',
     block_ads: 'true',
     block_cookie_banners: 'true',
     block_trackers: 'true',
     delay: '2',
     timeout: '60',
-    image_quality: '80',
+    image_quality: '65',
   });
 
   const response = await fetch(`https://api.screenshotone.com/take?${params}`, {
