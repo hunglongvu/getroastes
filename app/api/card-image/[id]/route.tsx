@@ -151,9 +151,9 @@ export async function GET(
                 style={{
                   fontSize: 150 * S,
                   fontWeight: 900,
-                  color: '#ff3a1f',
+                  color: '#ff4520',
                   lineHeight: 1,
-                  textShadow: '0 0 60px rgba(255,58,31,0.6)',
+                  textShadow: '0 0 30px rgba(255,58,31,1), 0 0 60px rgba(255,58,31,0.8), 0 0 100px rgba(255,58,31,0.5)',
                 }}
               >
                 {roast.score}%
@@ -166,10 +166,10 @@ export async function GET(
                 style={{
                   fontSize: 76 * S,
                   fontWeight: 900,
-                  color: '#ff3a1f',
+                  color: '#ff4520',
                   letterSpacing: 6 * S,
                   lineHeight: 0.9,
-                  textShadow: '0 0 60px rgba(255,58,31,0.6)',
+                  textShadow: '0 0 30px rgba(255,58,31,1), 0 0 60px rgba(255,58,31,0.8), 0 0 100px rgba(255,58,31,0.5)',
                 }}
               >
                 COOKED
