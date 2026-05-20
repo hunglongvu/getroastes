@@ -1,5 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getRoast } from '@/lib/store';
+import fs from 'fs';
+import path from 'path';
 
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
@@ -8,12 +10,11 @@ const S = 2;
 const W = 800 * S;
 const H = 520 * S;
 
-async function loadOswald(): Promise<ArrayBuffer | null> {
+function loadInterBlack(): ArrayBuffer | null {
   try {
-    return fetch(
-      'https://fonts.gstatic.com/s/oswald/v53/TK3_WkUHHAIjg75cFRf3bXL8LICs13NvgUFoZAaRliE.ttf',
-      { signal: AbortSignal.timeout(5000) },
-    ).then((r) => r.arrayBuffer());
+    const fontPath = path.join(process.cwd(), 'public', 'fonts', 'inter-black.ttf');
+    const buffer = fs.readFileSync(fontPath);
+    return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
   } catch {
     return null;
   }
@@ -25,7 +26,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const [roast, oswaldData] = await Promise.all([getRoast(id), loadOswald()]);
+    const roast = await getRoast(id);
     if (!roast) return new Response('Not found', { status: 404 });
 
     const screenshotSrc =
@@ -33,8 +34,9 @@ export async function GET(
         ? `data:image/jpeg;base64,${roast.screenshotBase64}`
         : null;
 
-    const fonts = oswaldData
-      ? [{ name: 'Oswald', data: oswaldData, weight: 700 as const, style: 'normal' as const }]
+    const interBlackData = loadInterBlack();
+    const fonts = interBlackData
+      ? [{ name: 'Inter', data: interBlackData, weight: 900 as const, style: 'normal' as const }]
       : [];
 
     const img = new ImageResponse(
@@ -117,7 +119,7 @@ export async function GET(
                 style={{
                   fontSize: 160,
                   fontWeight: 700,
-                  fontFamily: 'Oswald',
+                  fontFamily: 'Inter',
                   color: '#ff8c00',
                   lineHeight: 1,
                   textShadow: '0 0 40px rgba(255,140,0,0.6)',
@@ -132,7 +134,7 @@ export async function GET(
                 style={{
                   fontSize: 80,
                   fontWeight: 700,
-                  fontFamily: 'Oswald',
+                  fontFamily: 'Inter',
                   color: '#ff8c00',
                   lineHeight: 0.9,
                   letterSpacing: 12,
