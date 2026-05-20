@@ -8,19 +8,41 @@ const S = 2;
 const W = 800 * S;
 const H = 520 * S;
 
+async function loadOswald(): Promise<ArrayBuffer | null> {
+  try {
+    const css = await fetch(
+      'https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap',
+      {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+        signal: AbortSignal.timeout(5000),
+      },
+    ).then((r) => r.text());
+    const matches = [...css.matchAll(/url\(([^)]+)\)\s+format\('woff2'\)/g)];
+    const url = matches[matches.length - 1]?.[1];
+    if (!url) return null;
+    return fetch(url, { signal: AbortSignal.timeout(5000) }).then((r) => r.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    const roast = await getRoast(id);
+    const [roast, oswaldData] = await Promise.all([getRoast(id), loadOswald()]);
     if (!roast) return new Response('Not found', { status: 404 });
 
     const screenshotSrc =
       roast.screenshotBase64 && roast.screenshotBase64.length < 200 * 1024
         ? `data:image/jpeg;base64,${roast.screenshotBase64}`
         : null;
+
+    const fonts = oswaldData
+      ? [{ name: 'Oswald', data: oswaldData, weight: 700 as const, style: 'normal' as const }]
+      : [];
 
     const img = new ImageResponse(
       (
@@ -101,9 +123,11 @@ export async function GET(
               <span
                 style={{
                   fontSize: 160,
-                  fontWeight: 900,
-                  color: '#ff4520',
+                  fontWeight: 700,
+                  fontFamily: 'Oswald',
+                  color: '#ff8c00',
                   lineHeight: 1,
+                  textShadow: '0 0 40px rgba(255,140,0,0.6)',
                 }}
               >
                 {roast.score}%
@@ -114,10 +138,12 @@ export async function GET(
               <span
                 style={{
                   fontSize: 80,
-                  fontWeight: 900,
-                  color: '#ff4520',
+                  fontWeight: 700,
+                  fontFamily: 'Oswald',
+                  color: '#ff8c00',
                   lineHeight: 0.9,
                   letterSpacing: 12,
+                  textShadow: '0 0 40px rgba(255,140,0,0.6)',
                 }}
               >
                 COOKED
@@ -129,7 +155,7 @@ export async function GET(
                 style={{
                   width: 200,
                   height: 4,
-                  background: '#ff3a1f',
+                  background: '#ff8c00',
                   borderRadius: 4,
                   display: 'flex',
                 }}
@@ -172,11 +198,9 @@ export async function GET(
           </div>
         </div>
       ),
-      { width: W, height: H },
+      { width: W, height: H, fonts },
     );
 
-    // Await the full buffer so any Satori error throws here (where try/catch works),
-    // not mid-stream where it would corrupt the response body.
     const buffer = await img.arrayBuffer();
     return new Response(buffer, {
       headers: { 'Content-Type': 'image/png' },
