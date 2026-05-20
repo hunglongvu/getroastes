@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'getroasted.wtf — AI Landing Page Roaster',
+  title: "Let's Get Roasted",
   description: 'Paste your landing page URL. Get brutally roasted by AI. Share on X. Go viral.',
   openGraph: {
     title: 'getroasted.wtf — AI Landing Page Roaster',
