@@ -63,6 +63,10 @@ type AiResponse = {
   roastLine: string;
 };
 
+function sse(data: object): Uint8Array {
+  return new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`);
+}
+
 export async function POST(request: NextRequest) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
@@ -101,79 +105,95 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Invalid URL format.' }, { status: 400 });
   }
 
-  // Take screenshot
-  let screenshot: { base64: string; mediaType: 'image/jpeg' };
-  try {
-    screenshot = await takeScreenshot(normalized);
-  } catch {
-    return Response.json(
-      { error: "Could not screenshot this URL. Check it's public and try again." },
-      { status: 422 }
-    );
-  }
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        controller.enqueue(sse({ type: 'progress', message: 'taking screenshot...' }));
 
-  // Claude Vision analysis
-  let aiData: AiResponse;
-  try {
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: screenshot.mediaType,
-                data: screenshot.base64,
+        let screenshot: { base64: string; mediaType: 'image/jpeg' };
+        try {
+          screenshot = await takeScreenshot(normalized);
+        } catch {
+          controller.enqueue(sse({ type: 'error', error: "Could not screenshot this URL. Check it's public and try again." }));
+          controller.close();
+          return;
+        }
+
+        controller.enqueue(sse({ type: 'progress', message: 'roasting your page...' }));
+
+        let aiData: AiResponse;
+        try {
+          const message = await client.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1024,
+            system: SYSTEM_PROMPT,
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'image',
+                    source: {
+                      type: 'base64',
+                      media_type: screenshot.mediaType,
+                      data: screenshot.base64,
+                    },
+                  },
+                  {
+                    type: 'text',
+                    text: `Roast this SaaS landing page. URL: ${normalized} (domain: ${domain})\n\nScore it, roast it, and return only valid JSON.`,
+                  },
+                ],
               },
-            },
-            {
-              type: 'text',
-              text: `Roast this SaaS landing page. URL: ${normalized} (domain: ${domain})\n\nScore it, roast it, and return only valid JSON.`,
-            },
-          ],
-        },
-      ],
-    });
+            ],
+          });
 
-    const content = message.content[0];
-    if (content.type !== 'text') throw new Error('Unexpected content type');
-    aiData = JSON.parse(content.text) as AiResponse;
+          const content = message.content[0];
+          if (content.type !== 'text') throw new Error('Unexpected content type');
+          aiData = JSON.parse(content.text) as AiResponse;
+          aiData.score = Math.max(0, Math.min(100, Math.round(aiData.score)));
+        } catch {
+          controller.enqueue(sse({ type: 'error', error: 'Failed to generate roast. Try again.' }));
+          controller.close();
+          return;
+        }
 
-    // Clamp score to valid range
-    aiData.score = Math.max(0, Math.min(100, Math.round(aiData.score)));
-  } catch {
-    return Response.json(
-      { error: 'Failed to generate roast. Try again.' },
-      { status: 500 }
-    );
-  }
+        const rarity = getRarity(aiData.score);
+        const character = CHARACTERS[rarity];
 
-  const rarity = getRarity(aiData.score);
-  const character = CHARACTERS[rarity];
+        const id = crypto.randomUUID();
+        const result: RoastResult = {
+          id,
+          url: normalized,
+          domain,
+          score: aiData.score,
+          roast: aiData.roastLine,
+          stderr: '',
+          tags: [],
+          rarity,
+          characterName: character.name,
+          characterEmoji: character.emoji,
+          characterDescription: character.description,
+          createdAt: Date.now(),
+          screenshotBase64: screenshot.base64,
+        };
 
-  const id = crypto.randomUUID();
-  const result: RoastResult = {
-    id,
-    url: normalized,
-    domain,
-    score: aiData.score,
-    roast: aiData.roastLine,
-    stderr: '',
-    tags: [],
-    rarity,
-    characterName: character.name,
-    characterEmoji: character.emoji,
-    characterDescription: character.description,
-    createdAt: Date.now(),
-    screenshotBase64: screenshot.base64,
-  };
+        await saveRoast(result);
 
-  await saveRoast(result);
+        controller.enqueue(sse({ type: 'done', result }));
+        controller.close();
+      } catch (err) {
+        controller.enqueue(sse({ type: 'error', error: String(err) }));
+        controller.close();
+      }
+    },
+  });
 
-  return Response.json(result);
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  });
 }

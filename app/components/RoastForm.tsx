@@ -53,20 +53,45 @@ export function RoastForm() {
         body: JSON.stringify({ url: url.trim() }),
       });
 
-      const data: RoastResult & { error?: string } = await res.json();
-
-      if (!res.ok || data.error) {
+      if (!res.ok) {
+        const data: { error?: string } = await res.json();
         setAnimating(false);
         setError(data.error ?? 'Something went wrong. Try again.');
         return;
       }
 
-      resultRef.current = data;
-      setApiReady(true);
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
 
-      // If animation already finished, navigate immediately
-      if (navigatedRef.current === false && resultRef.current) {
-        // animationDone will handle it if it already fired
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split('\n\n');
+        buffer = events.pop() ?? '';
+
+        for (const event of events) {
+          const line = event.split('\n').find((l) => l.startsWith('data:'));
+          if (!line) continue;
+
+          const json = JSON.parse(line.slice('data:'.length).trim()) as {
+            type: string;
+            result?: RoastResult;
+            error?: string;
+          };
+
+          if (json.type === 'done' && json.result) {
+            resultRef.current = json.result;
+            setApiReady(true);
+          } else if (json.type === 'error') {
+            setAnimating(false);
+            setError(json.error ?? 'Something went wrong. Try again.');
+            return;
+          }
+        }
       }
     } catch {
       setAnimating(false);
