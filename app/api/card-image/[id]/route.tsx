@@ -100,7 +100,7 @@ export async function GET(
             <div style={{ display: 'flex' }}>
               <span
                 style={{
-                  fontSize: 300,
+                  fontSize: 200,
                   fontWeight: 900,
                   color: '#ff4520',
                   lineHeight: 1,
@@ -113,7 +113,7 @@ export async function GET(
             <div style={{ display: 'flex' }}>
               <span
                 style={{
-                  fontSize: 152,
+                  fontSize: 112,
                   fontWeight: 900,
                   color: '#ff4520',
                   lineHeight: 0.9,
@@ -139,11 +139,11 @@ export async function GET(
             <div style={{ display: 'flex', width: 800, justifyContent: 'center' }}>
               <span
                 style={{
-                  fontSize: 30,
-                  color: 'rgba(255,255,255,0.9)',
+                  fontSize: 64,
+                  color: 'rgba(255,255,255,0.95)',
                   textAlign: 'center',
                   lineHeight: 1.55,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 {roast.roast}
