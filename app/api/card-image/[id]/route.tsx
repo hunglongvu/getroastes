@@ -45,6 +45,8 @@ export async function GET(
               objectFit: 'cover',
               objectPosition: 'top',
               display: 'flex',
+              filter: 'blur(4px)',
+              transform: 'scale(1.05)',
             }}
           />
         )}
