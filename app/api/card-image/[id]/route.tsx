@@ -6,17 +6,35 @@ const S = 2;
 const W = 800 * S;
 const H = 520 * S;
 
+async function loadInterBlack(): Promise<ArrayBuffer | null> {
+  try {
+    const css = await fetch(
+      'https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap',
+      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)' } },
+    ).then((r) => r.text());
+    const url = css.match(/src: url\(([^)]+)\) format\('woff2'\)/)?.[1];
+    if (!url) return null;
+    return fetch(url).then((r) => r.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const roast = await getRoast(id);
+  const [roast, fontData] = await Promise.all([getRoast(id), loadInterBlack()]);
   if (!roast) return new Response('Not found', { status: 404 });
 
   const screenshotSrc = roast.screenshotBase64
     ? `data:image/jpeg;base64,${roast.screenshotBase64}`
     : null;
+
+  const fonts = fontData
+    ? [{ name: 'Inter', data: fontData, weight: 900 as const, style: 'normal' as const }]
+    : [];
 
   return new ImageResponse(
     (
@@ -153,9 +171,10 @@ export async function GET(
                 style={{
                   fontSize: 150 * S,
                   fontWeight: 900,
+                  fontFamily: 'Inter',
                   color: '#ff4520',
                   lineHeight: 1,
-                  textShadow: '0 0 30px rgba(255,58,31,1), 0 0 60px rgba(255,58,31,0.8), 0 0 100px rgba(255,58,31,0.5)',
+                  textShadow: '0 0 20px rgba(255,58,31,0.9)',
                 }}
               >
                 {roast.score}%
@@ -168,10 +187,11 @@ export async function GET(
                 style={{
                   fontSize: 76 * S,
                   fontWeight: 900,
+                  fontFamily: 'Inter',
                   color: '#ff4520',
                   letterSpacing: 6 * S,
                   lineHeight: 0.9,
-                  textShadow: '0 0 30px rgba(255,58,31,1), 0 0 60px rgba(255,58,31,0.8), 0 0 100px rgba(255,58,31,0.5)',
+                  textShadow: '0 0 20px rgba(255,58,31,0.9)',
                 }}
               >
                 COOKED
@@ -196,7 +216,7 @@ export async function GET(
               <span
                 style={{
                   fontSize: 15 * S,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: 'rgba(255,255,255,0.9)',
                   textAlign: 'center',
                   lineHeight: 1.55,
                   fontWeight: 500,
@@ -223,6 +243,6 @@ export async function GET(
         </div>
       </div>
     ),
-    { width: W, height: H },
+    { width: W, height: H, fonts },
   );
 }
