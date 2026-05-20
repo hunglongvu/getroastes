@@ -84,11 +84,11 @@ export async function GET(
               src={screenshotSrc}
               alt={roast.domain}
               width={W}
-              height={140 * S}
+              height={110 * S}
               style={{ objectFit: 'cover', objectPosition: 'top' }}
             />
           ) : (
-            <div style={{ width: W, height: 140 * S, background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: W, height: 110 * S, background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ color: '#333', fontSize: 11 * S }}>no screenshot</span>
             </div>
           )}

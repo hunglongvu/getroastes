@@ -6,7 +6,7 @@ export async function takeScreenshot(
     url,
     format: 'jpg',
     viewport_width: '1400',
-    viewport_height: '900',
+    viewport_height: '1200',
     full_page: 'false',
     block_ads: 'true',
     block_cookie_banners: 'true',
