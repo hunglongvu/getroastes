@@ -13,7 +13,10 @@ async function loadInterBlack(): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(
       'https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap',
-      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)' } },
+      {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)' },
+        signal: AbortSignal.timeout(5000),
+      },
     ).then((r) => r.text());
     const url = css.match(/src: url\(([^)]+)\) format\('woff2'\)/)?.[1];
     if (!url) return null;
@@ -66,8 +69,6 @@ export async function GET(
               objectFit: 'cover',
               objectPosition: 'top',
               display: 'flex',
-              filter: 'blur(4px)',
-              transform: 'scale(1.05)',
             }}
           />
         )}
