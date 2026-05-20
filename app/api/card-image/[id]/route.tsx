@@ -36,7 +36,7 @@ export async function GET(
     ? [{ name: 'Inter', data: fontData, weight: 900 as const, style: 'normal' as const }]
     : [];
 
-  return new ImageResponse(
+  try { return new ImageResponse(
     (
       <div
         style={{
@@ -244,5 +244,11 @@ export async function GET(
       </div>
     ),
     { width: W, height: H, fonts },
-  );
+  ); } catch (err) {
+    console.error('Card generation error:', err);
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

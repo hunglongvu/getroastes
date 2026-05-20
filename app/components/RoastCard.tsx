@@ -120,20 +120,14 @@ export function RoastCard({ data, rank }: { data: RoastResult; rank?: number }) 
 
     try {
       const response = await fetch(`/api/card-image/${data.id}`);
+      if (!response.ok) throw new Error(`Card generation failed: ${response.status}`);
       const blob = await response.blob();
-      const objectUrl = window.URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.style.display = 'none';
-      link.href = objectUrl;
-      link.download = `roast-${data.domain}.png`;
-      document.body.appendChild(link);
-      link.click();
-
-      setTimeout(() => {
-        window.URL.revokeObjectURL(objectUrl);
-        document.body.removeChild(link);
-      }, 100);
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `roast-${data.domain}.png`;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error('Download failed:', err);
       window.open(`/api/card-image/${data.id}`, '_blank');
