@@ -100,7 +100,7 @@ export async function GET(
             <div style={{ display: 'flex' }}>
               <span
                 style={{
-                  fontSize: 200,
+                  fontSize: 160,
                   fontWeight: 900,
                   color: '#ff4520',
                   lineHeight: 1,
@@ -113,7 +113,7 @@ export async function GET(
             <div style={{ display: 'flex' }}>
               <span
                 style={{
-                  fontSize: 112,
+                  fontSize: 80,
                   fontWeight: 900,
                   color: '#ff4520',
                   lineHeight: 0.9,
@@ -139,7 +139,7 @@ export async function GET(
             <div style={{ display: 'flex', width: 800, justifyContent: 'center' }}>
               <span
                 style={{
-                  fontSize: 64,
+                  fontSize: 22,
                   color: 'rgba(255,255,255,0.95)',
                   textAlign: 'center',
                   lineHeight: 1.55,
