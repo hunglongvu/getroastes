@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Let's Get Roasted",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>",
+  },
   description: 'Paste your landing page URL. Get brutally roasted by AI. Share on X. Go viral.',
   openGraph: {
     title: 'getroasted.wtf — AI Landing Page Roaster',
