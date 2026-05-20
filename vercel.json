@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/api/card-image/[id]/route.tsx": {
+      "memory": 1024
+    }
+  }
+}

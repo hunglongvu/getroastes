@@ -1,6 +1,9 @@
 import { ImageResponse } from 'next/og';
 import { getRoast } from '@/lib/store';
 
+export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
+
 // 2x — 1600px output, sharp at 800px display
 const S = 2;
 const W = 800 * S;
