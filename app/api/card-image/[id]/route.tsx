@@ -10,17 +10,10 @@ const H = 520 * S;
 
 async function loadOswald(): Promise<ArrayBuffer | null> {
   try {
-    const css = await fetch(
-      'https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap',
-      {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
-        signal: AbortSignal.timeout(5000),
-      },
-    ).then((r) => r.text());
-    const matches = [...css.matchAll(/url\(([^)]+)\)\s+format\('woff2'\)/g)];
-    const url = matches[matches.length - 1]?.[1];
-    if (!url) return null;
-    return fetch(url, { signal: AbortSignal.timeout(5000) }).then((r) => r.arrayBuffer());
+    return fetch(
+      'https://fonts.gstatic.com/s/oswald/v53/TK3_WkUHHAIjg75cFRf3bXL8LICs13NvgUFoZAaRliE.ttf',
+      { signal: AbortSignal.timeout(5000) },
+    ).then((r) => r.arrayBuffer());
   } catch {
     return null;
   }
