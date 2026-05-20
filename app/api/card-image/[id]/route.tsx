@@ -4,7 +4,7 @@ import { getRoast } from '@/lib/store';
 // 2x — 1600px output, sharp at 800px display
 const S = 2;
 const W = 800 * S;
-const H = 620 * S;
+const H = 520 * S;
 
 export async function GET(
   _req: Request,
@@ -57,7 +57,7 @@ export async function GET(
             left: 0,
             width: W,
             height: H,
-            background: 'rgba(0,0,0,0.75)',
+            background: 'rgba(0,0,0,0.82)',
             display: 'flex',
           }}
         />
