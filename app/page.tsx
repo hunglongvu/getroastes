@@ -2,7 +2,6 @@ export const revalidate = 0;
 
 import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
-import { Embers } from './components/Embers';
 import { getHallOfShame } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
 
@@ -23,26 +22,19 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen bg-black text-white">
-      <Embers />
 
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-6 text-center">
-        <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
-          <span style={{ color: 'rgba(255,255,255,0.7)' }} className="fade-in">I think your landing page sucks.</span>
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight leading-tight" style={{ fontFamily: 'monospace' }}>
+          <span style={{ color: '#ffffff' }} className="fade-in">I think your landing page sucks.</span>
           <br />
-          <span
-            style={{
-              color: '#ff3a1f',
-              textShadow: '0 0 40px rgba(255,58,31,0.5)',
-            }}
-            className="fade-in-delay-1"
-          >
-            Prove me wrong.
+          <span style={{ color: '#FF3B30' }} className="fade-in-delay-1">
+            Prove me wrong.<span className="cursor-blink">_</span>
           </span>
         </h1>
 
-        <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 whitespace-nowrap fade-in-delay-2">
-          Paste URL. Get roasted. Share on X. Go viral.
+        <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 fade-in-delay-2">
+          $ first the AI cooks you. then twitter finishes the job.
         </p>
 
         <div className="fade-in-delay-3 w-full flex justify-center">

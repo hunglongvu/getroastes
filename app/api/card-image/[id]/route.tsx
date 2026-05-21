@@ -6,10 +6,8 @@ import path from 'path';
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 
-const S = 2;
-const W = 800 * S;
-const H = 520 * S;
-const TITLE_H = 40;
+const W = 1600;
+const H = 1040;
 
 const interBoldData = (() => {
   try {
@@ -20,6 +18,23 @@ const interBoldData = (() => {
   }
 })();
 
+function getCatTier(score: number): { name: string; file: string } {
+  if (score <= 19) return { name: 'BARELY COOKED', file: 'barely-cooked.png' };
+  if (score <= 39) return { name: 'LIGHTLY TOASTED', file: 'lightly-toasted.png' };
+  if (score <= 59) return { name: 'DEEP FRIED', file: 'deep-fried.png' };
+  if (score <= 79) return { name: 'CRISPY', file: 'crispy.png' };
+  return { name: 'BURNED', file: 'burned.png' };
+}
+
+function loadCatImage(file: string): string | null {
+  try {
+    const buf = fs.readFileSync(path.join(process.cwd(), 'public/cats', file));
+    return `data:image/png;base64,${buf.toString('base64')}`;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -29,17 +44,12 @@ export async function GET(
     const roast = await getRoast(id);
     if (!roast) return new Response('Not found', { status: 404 });
 
-    const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024; // 2MB
-    if (roast.screenshotBase64) {
-      console.log('Card screenshot base64 length:', roast.screenshotBase64.length, '/ limit:', MAX_SCREENSHOT_BYTES);
-    }
-    const screenshotSrc =
-      roast.screenshotBase64 && roast.screenshotBase64.length < MAX_SCREENSHOT_BYTES
-        ? `data:image/jpeg;base64,${roast.screenshotBase64}`
-        : null;
-    if (!screenshotSrc && roast.screenshotBase64) {
-      console.warn('Screenshot dropped: base64 length', roast.screenshotBase64.length, 'exceeds limit');
-    }
+    const tier = getCatTier(roast.score);
+    const catSrc = loadCatImage(tier.file);
+
+    const PAD_H = 80;
+    const PAD_V = 56;
+    const CAT_H = 460;
 
     const img = new ImageResponse(
       (
@@ -47,182 +57,131 @@ export async function GET(
           style={{
             width: W,
             height: H,
-            background: '#1e1e1e',
+            background: '#000000',
             display: 'flex',
             flexDirection: 'column',
-            borderRadius: 12,
-            border: '1px solid rgba(255,255,255,0.1)',
-            overflow: 'hidden',
+            alignItems: 'center',
+            paddingTop: PAD_V,
+            paddingBottom: PAD_V,
+            paddingLeft: PAD_H,
+            paddingRight: PAD_H,
+            fontFamily: 'Inter',
           }}
         >
-          {/* macOS title bar */}
+          {/* Cat image */}
           <div
             style={{
-              width: W,
-              height: TITLE_H,
-              background: '#2d2d2d',
               display: 'flex',
+              height: CAT_H,
+              width: '100%',
               alignItems: 'center',
-              paddingLeft: 16,
+              justifyContent: 'center',
+              marginBottom: 36,
               flexShrink: 0,
             }}
           >
-            <div style={{ width: 14, height: 14, borderRadius: 7, background: '#FF5F57', display: 'flex' }} />
-            <div style={{ width: 14, height: 14, borderRadius: 7, background: '#FEBC2E', display: 'flex', marginLeft: 8 }} />
-            <div style={{ width: 14, height: 14, borderRadius: 7, background: '#28C840', display: 'flex', marginLeft: 8 }} />
-          </div>
-
-          {/* Content area */}
-          <div
-            style={{
-              width: W,
-              height: H - TITLE_H,
-              display: 'flex',
-              position: 'relative',
-            }}
-          >
-            {/* LAYER 1 — screenshot */}
-            {screenshotSrc && (
+            {catSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={screenshotSrc}
+                src={catSrc}
                 alt=""
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'top',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
+                  height: CAT_H,
+                  maxWidth: '100%',
+                  objectFit: 'contain',
                   display: 'flex',
                 }}
               />
+            ) : (
+              <div style={{ height: CAT_H, display: 'flex' }} />
             )}
+          </div>
 
-            {/* LAYER 2 — dark overlay */}
-            <div
+          {/* Tier name · Score% COOKED */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              marginBottom: 20,
+              flexShrink: 0,
+            }}
+          >
+            <span
               style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: W,
-                height: H - TITLE_H,
-                background: 'rgba(0,0,0,0.72)',
-                display: 'flex',
-              }}
-            />
-
-            {/* LAYER 3 — content */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: W,
-                height: H - TITLE_H,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingTop: 40,
-                paddingBottom: 40,
+                fontSize: 60,
+                fontWeight: 700,
+                color: '#FF3B30',
+                letterSpacing: 4,
+                lineHeight: 1,
               }}
             >
-              <div style={{ display: 'flex', marginBottom: 16 }}>
-                <span
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.35)',
-                    letterSpacing: 8,
-                  }}
-                >
-                  {roast.domain.toUpperCase()}
-                </span>
-              </div>
-
-              <div style={{ display: 'flex' }}>
-                <span
-                  style={{
-                    fontSize: 240,
-                    fontWeight: 700,
-                    fontFamily: 'Inter',
-                    color: '#ff8c00',
-                    lineHeight: 1,
-                    textShadow: '0 0 40px rgba(255,140,0,0.6)',
-                  }}
-                >
-                  {roast.score}%
-                </span>
-              </div>
-
-              <div style={{ display: 'flex' }}>
-                <span
-                  style={{
-                    fontSize: 140,
-                    fontWeight: 700,
-                    fontFamily: 'Inter',
-                    color: '#ff8c00',
-                    lineHeight: 0.9,
-                    letterSpacing: 12,
-                    textShadow: '0 0 40px rgba(255,140,0,0.6)',
-                  }}
-                >
-                  COOKED
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', marginTop: 40, marginBottom: 40 }}>
-                <div
-                  style={{
-                    width: 200,
-                    height: 4,
-                    background: '#ff8c00',
-                    borderRadius: 4,
-                    display: 'flex',
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', width: 800, justifyContent: 'center' }}>
-                <span
-                  style={{
-                    fontSize: 28,
-                    fontFamily: 'Inter',
-                    color: 'rgba(255,255,255,0.95)',
-                    textAlign: 'center',
-                    lineHeight: 1.55,
-                    fontWeight: 600,
-                  }}
-                >
-                  {roast.roast}
-                </span>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div
+              {tier.name}
+            </span>
+            <span
               style={{
-                position: 'absolute',
-                bottom: 32,
-                left: 0,
-                right: 0,
-                display: 'flex',
-                justifyContent: 'center',
+                fontSize: 60,
+                fontWeight: 700,
+                color: '#ffffff',
+                letterSpacing: 2,
+                lineHeight: 1,
+                marginLeft: 20,
               }}
             >
-              <span
-                style={{
-                  fontSize: 18,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.6)',
-                  letterSpacing: 2,
-                }}
-              >
-                getroasted.wtf
-              </span>
-            </div>
+              · {roast.score}% COOKED
+            </span>
+          </div>
+
+          {/* Divider */}
+          <div
+            style={{
+              width: '100%',
+              height: 1,
+              background: 'rgba(255,255,255,0.15)',
+              marginBottom: 24,
+              display: 'flex',
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Roast text */}
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              justifyContent: 'center',
+              marginBottom: 32,
+              flexGrow: 1,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 36,
+                fontWeight: 600,
+                color: '#ffffff',
+                textAlign: 'center',
+                lineHeight: 1.55,
+              }}
+            >
+              &ldquo;{roast.roast}&rdquo;
+            </span>
+          </div>
+
+          {/* Footer */}
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ fontSize: 22, fontWeight: 600, color: 'rgba(255,255,255,0.25)' }}>
+              {roast.domain}
+            </span>
+            <span style={{ fontSize: 22, fontWeight: 600, color: 'rgba(255,255,255,0.25)' }}>
+              getroasted.wtf
+            </span>
           </div>
         </div>
       ),

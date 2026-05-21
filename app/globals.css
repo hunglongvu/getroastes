@@ -17,6 +17,15 @@ body {
   color: var(--foreground);
 }
 
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-start infinite;
+}
+
 @keyframes fire-flicker {
   0%   { color: #E24B4A; text-shadow: 0 0 10px #E24B4A, 0 0 20px #ff4400, 0 0 40px #ff2200; }
   25%  { color: #ff6b35; text-shadow: 0 0 15px #ff6b35, 0 0 30px #ff4400, 0 0 60px #ff2200, 0 0 80px #ff0000; }
