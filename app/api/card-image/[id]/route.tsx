@@ -1,5 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getRoast } from '@/lib/store';
+import fs from 'fs';
+import path from 'path';
 
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
@@ -7,6 +9,15 @@ export const dynamic = 'force-dynamic';
 const S = 2;
 const W = 800 * S;
 const H = 520 * S;
+
+const interBoldData = (() => {
+  try {
+    const buf = fs.readFileSync(path.join(process.cwd(), 'public/fonts/inter-bold.ttf'));
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  } catch {
+    return null;
+  }
+})();
 
 export async function GET(
   _req: Request,
@@ -119,7 +130,8 @@ export async function GET(
               <span
                 style={{
                   fontSize: 240,
-                  fontWeight: 900,
+                  fontWeight: 700,
+                  fontFamily: 'Inter',
                   color: '#ff8c00',
                   lineHeight: 1,
                   textShadow: '0 0 40px rgba(255,140,0,0.6)',
@@ -133,7 +145,8 @@ export async function GET(
               <span
                 style={{
                   fontSize: 140,
-                  fontWeight: 900,
+                  fontWeight: 700,
+                  fontFamily: 'Inter',
                   color: '#ff8c00',
                   lineHeight: 0.9,
                   letterSpacing: 12,
@@ -160,10 +173,11 @@ export async function GET(
               <span
                 style={{
                   fontSize: 44,
+                  fontFamily: 'Inter',
                   color: 'rgba(255,255,255,0.95)',
                   textAlign: 'center',
                   lineHeight: 1.55,
-                  fontWeight: 600,
+                  fontWeight: 700,
                 }}
               >
                 {roast.roast}
@@ -192,7 +206,13 @@ export async function GET(
           </div>
         </div>
       ),
-      { width: W, height: H },
+      {
+        width: W,
+        height: H,
+        fonts: interBoldData
+          ? [{ name: 'Inter', data: interBoldData, weight: 700 as const, style: 'normal' as const }]
+          : [],
+      },
     );
 
     const buffer = await img.arrayBuffer();
