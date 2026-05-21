@@ -53,9 +53,8 @@ export default async function HomePage() {
           warning: this will hurt your feelings.
         </p>
         <p className="font-mono text-sm mt-4 fade-in-delay-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          🔥{' '}
           <span style={{ color: '#ff8c00', fontWeight: 700 }}>{spotsTaken}</span>
-          {' '}of 100 founding spots taken
+          {' '}founders already crying
         </p>
       </section>
 
