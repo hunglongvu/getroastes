@@ -35,6 +35,8 @@ function loadCatImage(file: string): string | null {
   }
 }
 
+const TEXT_SHADOW = '0 0 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,1)';
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -53,9 +55,11 @@ export async function GET(
         ? `data:image/jpeg;base64,${roast.screenshotBase64}`
         : null;
 
+    // Strip any leading/trailing quote characters the model may have added
+    const roastText = roast.roast.replace(/^[“”‘’"']+|[“”‘’"']+$/g, '').trim();
+
     const PAD_H = 80;
     const PAD_V = 44;
-    // Cat grows to fill space above the text section; 640px is the max (~62% of H)
     const CAT_MAX_H = 640;
 
     const img = new ImageResponse(
@@ -120,7 +124,7 @@ export async function GET(
               overflow: 'hidden',
             }}
           >
-            {/* Cat — flexGrow fills available space above text, capped at CAT_MAX_H */}
+            {/* Cat — grows to fill space above text section */}
             <div
               style={{
                 display: 'flex',
@@ -129,7 +133,7 @@ export async function GET(
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: 0,
-                marginBottom: 28,
+                marginBottom: 40,
               }}
             >
               {catSrc && (
@@ -142,26 +146,30 @@ export async function GET(
                     maxWidth: '100%',
                     objectFit: 'contain',
                     display: 'flex',
+                    filter: 'drop-shadow(0 0 50px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,0,0,1))',
                   }}
                 />
               )}
             </div>
 
-            {/* Text section — pinned to bottom */}
+            {/* Text section */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
                 flexShrink: 0,
+                alignItems: 'center',
               }}
             >
-              {/* Tier · Score% COOKED */}
+              {/* Tier · Score% COOKED — centered */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'flex-end',
+                  justifyContent: 'center',
                   marginBottom: 14,
+                  width: '100%',
                 }}
               >
                 <span
@@ -171,6 +179,7 @@ export async function GET(
                     color: '#FF3B30',
                     letterSpacing: 4,
                     lineHeight: 1,
+                    textShadow: TEXT_SHADOW,
                   }}
                 >
                   {tier.name}
@@ -183,6 +192,7 @@ export async function GET(
                     letterSpacing: 2,
                     lineHeight: 1,
                     marginLeft: 20,
+                    textShadow: TEXT_SHADOW,
                   }}
                 >
                   · {roast.score}% COOKED
@@ -195,18 +205,19 @@ export async function GET(
                   width: '100%',
                   height: 1,
                   background: 'rgba(255,255,255,0.2)',
-                  marginBottom: 20,
+                  marginBottom: 60,
                   display: 'flex',
                   flexShrink: 0,
                 }}
               />
 
-              {/* Roast text */}
+              {/* Roast text — centered */}
               <div
                 style={{
                   display: 'flex',
                   width: '100%',
-                  marginBottom: 20,
+                  justifyContent: 'center',
+                  marginBottom: 28,
                 }}
               >
                 <span
@@ -216,14 +227,14 @@ export async function GET(
                     color: '#ffffff',
                     lineHeight: 1.5,
                     textAlign: 'center',
-                    width: '100%',
+                    textShadow: TEXT_SHADOW,
                   }}
                 >
-                  &ldquo;{roast.roast}&rdquo;
+                  &ldquo;{roastText}&rdquo;
                 </span>
               </div>
 
-              {/* Footer */}
+              {/* Footer — domain left, brand right */}
               <div
                 style={{
                   display: 'flex',
@@ -237,6 +248,7 @@ export async function GET(
                     fontSize: 22,
                     fontWeight: 600,
                     color: 'rgba(255,255,255,0.3)',
+                    textShadow: TEXT_SHADOW,
                   }}
                 >
                   {roast.domain}
@@ -246,6 +258,7 @@ export async function GET(
                     fontSize: 22,
                     fontWeight: 600,
                     color: 'rgba(255,255,255,0.3)',
+                    textShadow: TEXT_SHADOW,
                   }}
                 >
                   getroasted.wtf
