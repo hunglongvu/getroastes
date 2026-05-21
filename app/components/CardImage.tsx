@@ -2,79 +2,124 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const LOADING_MESSAGES = [
-  'cooking your card...',
-  'summoning the cat...',
-  'preparing your shame...',
-  'loading your trauma...',
-  'compiling regret...',
+const ALL_LINES = [
+  'rendering your shame...',
+  'summoning the right cat...',
+  'adjusting cook temperature...',
+  'compiling your regret...',
   'downloading the truth...',
-  'rendering disappointment...',
+  'preparing meme format...',
+  'cropping your dignity...',
+  'saving evidence...',
+  'burning the file in...',
+  'calibrating cat judgment...',
+  'warming up the oven...',
 ];
 
+type LoadState = 'loading' | 'exiting' | 'loaded' | 'error';
+
 export default function CardImage({ src, alt }: { src: string; alt: string }) {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
-  const messageRef = useRef(
-    LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)],
+  const [state, setState] = useState<LoadState>('loading');
+  const [retryKey, setRetryKey] = useState(0);
+  const linesRef = useRef<string[]>(
+    [...ALL_LINES].sort(() => Math.random() - 0.5).slice(0, 4),
   );
 
+  // 10s timeout fallback
   useEffect(() => {
-    if (loaded) return;
     const timeout = setTimeout(() => {
-      setError(true);
+      setState((s) => (s === 'loading' ? 'error' : s));
     }, 10000);
     return () => clearTimeout(timeout);
-  }, [loaded]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retryKey]);
+
+  const handleLoad = () => {
+    setState('exiting');
+    setTimeout(() => setState('loaded'), 300);
+  };
+
+  const handleError = () => setState('error');
+
+  const handleRetry = () => {
+    linesRef.current = [...ALL_LINES].sort(() => Math.random() - 0.5).slice(0, 4);
+    setRetryKey((k) => k + 1);
+    setState('loading');
+  };
+
+  const showTerminal = state === 'loading' || state === 'exiting';
 
   return (
     <div className="card-preview-wrapper">
-      {!loaded && !error && (
-        <div className="card-loading">
-          <div className="card-loading-content">
-            <div className="card-loading-icon">🔥</div>
-            <div className="card-loading-text">{messageRef.current}</div>
-            <div className="card-loading-progress">
-              <span className="card-loading-dot" />
-              <span className="card-loading-dot" />
-              <span className="card-loading-dot" />
+      {/* Terminal loading / error */}
+      {(showTerminal || state === 'error') && (
+        <div className={`card-loading-terminal${state === 'exiting' ? ' exiting' : ''}`}>
+          <div className="terminal-header">
+            <span className="terminal-dot red" />
+            <span className="terminal-dot yellow" />
+            <span className="terminal-dot green" />
+            <span className="terminal-title">card-renderer — zsh</span>
+          </div>
+
+          {state === 'error' ? (
+            <div className="terminal-body">
+              <div className="terminal-line" style={{ opacity: 1 }}>
+                <span className="prompt warning">&gt;</span>
+                <span className="text warning">card failed to render.</span>
+              </div>
+              <div className="terminal-line" style={{ opacity: 1, animationDelay: '0.1s' }}>
+                <span className="prompt">$</span>
+                <span className="text">
+                  <button
+                    onClick={handleRetry}
+                    style={{
+                      fontFamily: 'inherit',
+                      fontSize: 'inherit',
+                      color: '#00FF41',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    try again →
+                  </button>
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="terminal-body">
+              {linesRef.current.map((line, i) => (
+                <div key={i} className="terminal-line">
+                  <span className="prompt">$</span>
+                  <span className="text">{line}</span>
+                </div>
+              ))}
+              <div className="terminal-line">
+                <span className="prompt warning">&gt;</span>
+                <span className="text warning">
+                  almost ready
+                  <span className="terminal-cursor">█</span>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {error && (
-        <div className="card-loading">
-          <div className="card-loading-content">
-            <div className="card-loading-icon">⚠️</div>
-            <div className="card-loading-text">card failed to load.</div>
-            <button
-              onClick={() => { setError(false); setLoaded(false); }}
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 13,
-                color: '#FF3B30',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                marginTop: 8,
-              }}
-            >
-              try again →
-            </button>
-          </div>
-        </div>
+      {/* Actual image — always in DOM while not errored so onLoad fires */}
+      {state !== 'error' && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={retryKey}
+          src={src}
+          alt={alt}
+          onLoad={handleLoad}
+          onError={handleError}
+          className={state === 'loaded' ? 'card-image loaded' : 'card-image loading'}
+          style={{ borderRadius: 8 }}
+        />
       )}
-
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={alt}
-        onLoad={() => setLoaded(true)}
-        onError={() => setError(true)}
-        className={loaded ? 'card-image loaded' : 'card-image loading'}
-        style={{ borderRadius: 8 }}
-      />
     </div>
   );
 }
