@@ -8,7 +8,6 @@ export async function takeScreenshot(
     viewport_width: '1400',
     viewport_height: '800',
     device_scale_factor: '2',
-    retina: 'true',
     full_page: 'false',
     block_ads: 'true',
     block_cookie_banners: 'true',
