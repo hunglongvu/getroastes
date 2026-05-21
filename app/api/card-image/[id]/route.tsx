@@ -37,6 +37,14 @@ function loadCatImage(file: string): string | null {
 
 const TEXT_SHADOW = '0 0 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,1)';
 
+function getQuoteFontSize(text: string): number {
+  const length = text.length;
+  if (length < 60) return 52;
+  if (length < 120) return 44;
+  if (length < 180) return 38;
+  return 34;
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -59,8 +67,8 @@ export async function GET(
     const roastText = roast.roast.replace(/^[“”‘’"']+|[“”‘’"']+$/g, '').trim();
 
     const PAD_H = 80;
-    const PAD_V = 44;
-    const CAT_MAX_H = 640;
+    const PAD_V = 40;
+    const CAT_MAX_H = 400;
 
     const img = new ImageResponse(
       (
@@ -133,7 +141,7 @@ export async function GET(
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: 0,
-                marginBottom: 40,
+                marginBottom: 24,
               }}
             >
               {catSrc && (
@@ -168,7 +176,7 @@ export async function GET(
                   display: 'flex',
                   alignItems: 'flex-end',
                   justifyContent: 'center',
-                  marginBottom: 14,
+                  marginBottom: 12,
                   width: '100%',
                 }}
               >
@@ -205,7 +213,7 @@ export async function GET(
                   width: '100%',
                   height: 1,
                   background: 'rgba(255,255,255,0.2)',
-                  marginBottom: 60,
+                  marginBottom: 32,
                   display: 'flex',
                   flexShrink: 0,
                 }}
@@ -222,7 +230,7 @@ export async function GET(
               >
                 <span
                   style={{
-                    fontSize: 44,
+                    fontSize: getQuoteFontSize(roastText),
                     fontWeight: 600,
                     color: '#ffffff',
                     lineHeight: 1.5,
