@@ -73,8 +73,8 @@ export function ShareButton({ data }: { data: RoastResult }) {
     setButtonState('capturing');
 
     const tweetText = data.score >= 50
-      ? `asked an AI to roast my landing page. didn't expect it to be this personal.\n\n${data.roast}\n\nyours would be worse. getroasted.wtf`
-      : `asked an AI to roast my landing page. it went easier than expected.\n\n${data.roast}\n\nyours would not. getroasted.wtf`;
+      ? `asked an AI to roast my landing page. didn't expect it to be this personal.\n\n"${data.roast}"\n\nyours would be worse. getroasted.wtf`
+      : `asked an AI to roast my landing page. it went easier than expected.\n\n"${data.roast}"\n\nyours would not. getroasted.wtf`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
 
     try {
