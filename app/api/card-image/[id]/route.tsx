@@ -34,7 +34,7 @@ export async function GET(
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            border: '2px solid rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.12)',
           }}
         >
           {/* LAYER 1 — screenshot */}
@@ -55,7 +55,7 @@ export async function GET(
             />
           )}
 
-          {/* LAYER 2 — dark overlay */}
+          {/* LAYER 2 — gradient overlay: lighter top, darker bottom */}
           <div
             style={{
               position: 'absolute',
@@ -63,10 +63,13 @@ export async function GET(
               left: 0,
               width: W,
               height: H,
-              background: 'rgba(0,0,0,0.82)',
               display: 'flex',
+              flexDirection: 'column',
             }}
-          />
+          >
+            <div style={{ width: W, height: H / 2, background: 'rgba(0,0,0,0.55)', display: 'flex' }} />
+            <div style={{ width: W, height: H / 2, background: 'rgba(0,0,0,0.88)', display: 'flex' }} />
+          </div>
 
           {/* LAYER 3 — content */}
           <div
@@ -84,6 +87,21 @@ export async function GET(
               paddingBottom: 40,
             }}
           >
+            {/* Browser dots */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 32,
+                left: 40,
+                display: 'flex',
+                flexDirection: 'row',
+              }}
+            >
+              <div style={{ width: 14, height: 14, borderRadius: 7, background: '#FF5F57', display: 'flex' }} />
+              <div style={{ width: 14, height: 14, borderRadius: 7, background: '#FEBC2E', display: 'flex', marginLeft: 8 }} />
+              <div style={{ width: 14, height: 14, borderRadius: 7, background: '#28C840', display: 'flex', marginLeft: 8 }} />
+            </div>
+
             <div style={{ display: 'flex', marginBottom: 16 }}>
               <span
                 style={{
@@ -163,9 +181,10 @@ export async function GET(
           >
             <span
               style={{
-                fontSize: 22,
-                color: 'rgba(255,255,255,0.18)',
-                letterSpacing: 4,
+                fontSize: 18,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.6)',
+                letterSpacing: 2,
               }}
             >
               getroasted.wtf
