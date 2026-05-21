@@ -21,10 +21,9 @@ export function RoastCounter() {
   if (count === null) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-3">
-      <span className="text-[#E24B4A] text-sm">🔥</span>
-      <span className="font-mono text-xs text-zinc-500">
-        <span className="text-zinc-300 font-medium">
+    <div className="flex items-center justify-center gap-2 mt-6 mb-2">
+      <span style={{ fontSize: 22, fontWeight: 600, fontFamily: 'monospace', color: 'rgba(255,255,255,0.5)' }}>
+        <span style={{ color: '#ff8c00', fontWeight: 700, fontSize: 26 }}>
           {count.toLocaleString()}
         </span>
         {' '}landing pages roasted

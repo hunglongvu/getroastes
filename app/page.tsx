@@ -24,9 +24,17 @@ export default async function HomePage() {
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
-          <span className="text-white fade-in">First the AI <span className="fire-text">roasts</span> you.</span>
+          <span style={{ color: 'rgba(255,255,255,0.7)' }} className="fade-in">First the AI roasts you.</span>
           <br />
-          <span className="text-[#E24B4A] fade-in-delay-1">Then the internet does.</span>
+          <span
+            style={{
+              color: '#ff3a1f',
+              textShadow: '0 0 40px rgba(255,58,31,0.5)',
+            }}
+            className="fade-in-delay-1"
+          >
+            Then the internet does.
+          </span>
         </h1>
 
         <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 whitespace-nowrap fade-in-delay-2">
@@ -44,12 +52,22 @@ export default async function HomePage() {
       </section>
 
       {/* 2 · Hall of Shame preview */}
-      <section className="relative z-10 border-t border-zinc-900 py-12 px-4 max-w-2xl mx-auto w-full fade-in-delay-4">
+      <section className="relative z-10 py-12 px-4 max-w-2xl mx-auto w-full fade-in-delay-4">
+        <div style={{ width: '100%', height: 1, background: 'rgba(255,140,0,0.2)', marginBottom: 32 }} />
         <div className="mb-6">
-          <p className="font-mono font-bold text-sm" style={{ color: '#FFB800' }}>
-            🏆 Hall of Shame
+          <p
+            className="font-mono font-bold"
+            style={{
+              fontSize: 32,
+              fontWeight: 800,
+              color: '#ff8c00',
+              textShadow: '0 0 20px rgba(255,140,0,0.3)',
+              marginBottom: 8,
+            }}
+          >
+            HALL OF SHAME
           </p>
-          <p className="text-zinc-600 font-mono text-xs mt-1">
+          <p className="font-mono text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
             the worst landing pages the internet has to offer
           </p>
         </div>

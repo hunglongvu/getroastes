@@ -124,7 +124,14 @@ export function RoastForm() {
           <button
             type="submit"
             disabled={animating || !url.trim()}
-            className="px-6 py-3 rounded-lg bg-[#E24B4A] text-white font-mono text-sm font-medium hover:bg-[#c73a39] disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap cursor-pointer"
+            className="px-6 py-3 rounded-lg text-white font-mono text-sm disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer transition-colors"
+            style={{
+              backgroundColor: '#ff3a1f',
+              fontWeight: 700,
+              boxShadow: '0 0 30px rgba(255,58,31,0.4)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ff5438'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ff3a1f'; }}
           >
             Roast it →
           </button>
