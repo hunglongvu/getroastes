@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
     return Response.json(
       {
         error: 'limit_reached',
-        message: "You've used your 3 free roasts today. Come back tomorrow or join the waitlist.",
+        message: "You've used your 3 free roasts today. Come back tomorrow for 3 more.",
         resetAt,
       },
       { status: 429 },

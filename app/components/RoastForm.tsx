@@ -261,20 +261,12 @@ export function RoastForm() {
         <p className="font-mono font-bold mb-3" style={{ fontSize: 16, color: '#ffffff' }}>
           you&apos;ve been roasted enough today.
         </p>
-        <p className="font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
-          come back tomorrow or →
+        <p className="font-mono text-sm" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>
+          come back tomorrow for 3 more.
         </p>
-        <a
-          href="#waitlist"
-          className="font-mono text-sm"
-          style={{
-            display: 'inline-block', padding: '10px 20px',
-            border: '1px solid rgba(255,59,48,0.5)', borderRadius: 6,
-            color: '#FF3B30', textDecoration: 'none',
-          }}
-        >
-          join waitlist for unlimited
-        </a>
+        <p className="font-mono text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          (or share what you got 🔥)
+        </p>
       </div>
     );
   }
