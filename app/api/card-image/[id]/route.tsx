@@ -1,7 +1,5 @@
 import { ImageResponse } from 'next/og';
 import { getRoast } from '@/lib/store';
-import fs from 'fs';
-import path from 'path';
 
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
@@ -9,16 +7,6 @@ export const dynamic = 'force-dynamic';
 const S = 2;
 const W = 800 * S;
 const H = 520 * S;
-
-function loadInterBlack(): ArrayBuffer | null {
-  try {
-    const fontPath = path.join(process.cwd(), 'public', 'fonts', 'inter-black.ttf');
-    const buffer = fs.readFileSync(fontPath);
-    return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
-  } catch {
-    return null;
-  }
-}
 
 export async function GET(
   _req: Request,
@@ -33,11 +21,6 @@ export async function GET(
       roast.screenshotBase64 && roast.screenshotBase64.length < 200 * 1024
         ? `data:image/jpeg;base64,${roast.screenshotBase64}`
         : null;
-
-    const interBlackData = loadInterBlack();
-    const fonts = interBlackData
-      ? [{ name: 'Inter', data: interBlackData, weight: 900 as const, style: 'normal' as const }]
-      : [];
 
     const img = new ImageResponse(
       (
@@ -107,7 +90,6 @@ export async function GET(
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.35)',
                   letterSpacing: 8,
-                  fontFamily: 'monospace',
                 }}
               >
                 {roast.domain.toUpperCase()}
@@ -118,8 +100,7 @@ export async function GET(
               <span
                 style={{
                   fontSize: 160,
-                  fontWeight: 700,
-                  fontFamily: 'Inter',
+                  fontWeight: 900,
                   color: '#ff8c00',
                   lineHeight: 1,
                   textShadow: '0 0 40px rgba(255,140,0,0.6)',
@@ -133,8 +114,7 @@ export async function GET(
               <span
                 style={{
                   fontSize: 80,
-                  fontWeight: 700,
-                  fontFamily: 'Inter',
+                  fontWeight: 900,
                   color: '#ff8c00',
                   lineHeight: 0.9,
                   letterSpacing: 12,
@@ -184,7 +164,6 @@ export async function GET(
               style={{
                 fontSize: 22,
                 color: 'rgba(255,255,255,0.18)',
-                fontFamily: 'monospace',
                 letterSpacing: 4,
               }}
             >
@@ -193,7 +172,7 @@ export async function GET(
           </div>
         </div>
       ),
-      { width: W, height: H, fonts },
+      { width: W, height: H },
     );
 
     const buffer = await img.arrayBuffer();
