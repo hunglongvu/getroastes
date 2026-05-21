@@ -99,6 +99,36 @@ export default function PrivacyPage() {
 
         <Divider />
 
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>Cookies</SectionTitle>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 16 }}>
+            This site uses essential cookies only:
+          </p>
+          <ul style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2.2, color: 'rgba(255,255,255,0.6)', paddingLeft: 0, listStyle: 'none' }}>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Cloudflare Turnstile</strong> (bot protection)</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Vercel</strong> (hosting essentials)</li>
+          </ul>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.4)', marginTop: 16 }}>
+            No tracking, no analytics, no third-party advertising cookies.
+          </p>
+        </section>
+
+        <Divider />
+
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>Removal Requests</SectionTitle>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.75)' }}>
+            If your company&apos;s URL has been roasted and you want it removed from getroasted.wtf,
+            email{' '}
+            <a href="mailto:info@hunglongvu.com" style={{ color: '#FF3B30', textDecoration: 'none' }}>
+              info@hunglongvu.com
+            </a>
+            {' '}with the URL. We remove within 48 hours, no questions asked.
+          </p>
+        </section>
+
+        <Divider />
+
         <section>
           <SectionTitle>Changes</SectionTitle>
           <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.4)' }}>

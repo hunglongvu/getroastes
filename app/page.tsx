@@ -134,6 +134,17 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Disclaimer */}
+      <div className="relative z-10 px-4 pb-6 text-center">
+        <p className="font-mono text-zinc-700 text-xs leading-relaxed max-w-lg mx-auto">
+          ⚠️ DISCLAIMER: This is satire. AI-generated roasts are jokes, not factual claims.
+          Remove your URL anytime:{' '}
+          <a href="mailto:info@hunglongvu.com" className="text-zinc-600 hover:text-zinc-400 transition-colors">
+            info@hunglongvu.com
+          </a>
+        </p>
+      </div>
+
       {/* Footer */}
       <footer className="relative z-10 pb-10 text-center">
         <Link href="/imprint" className="font-mono text-zinc-700 text-xs hover:text-zinc-500 transition-colors">
