@@ -86,7 +86,7 @@ export async function GET(
             <div style={{ display: 'flex', marginBottom: 16 }}>
               <span
                 style={{
-                  fontSize: 22,
+                  fontSize: 28,
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.35)',
                   letterSpacing: 8,
@@ -99,7 +99,7 @@ export async function GET(
             <div style={{ display: 'flex' }}>
               <span
                 style={{
-                  fontSize: 160,
+                  fontSize: 240,
                   fontWeight: 900,
                   color: '#ff8c00',
                   lineHeight: 1,
@@ -113,7 +113,7 @@ export async function GET(
             <div style={{ display: 'flex' }}>
               <span
                 style={{
-                  fontSize: 80,
+                  fontSize: 140,
                   fontWeight: 900,
                   color: '#ff8c00',
                   lineHeight: 0.9,
@@ -140,7 +140,7 @@ export async function GET(
             <div style={{ display: 'flex', width: 800, justifyContent: 'center' }}>
               <span
                 style={{
-                  fontSize: 22,
+                  fontSize: 44,
                   color: 'rgba(255,255,255,0.95)',
                   textAlign: 'center',
                   lineHeight: 1.55,
