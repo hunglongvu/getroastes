@@ -47,9 +47,16 @@ export async function GET(
     const tier = getCatTier(roast.score);
     const catSrc = loadCatImage(tier.file);
 
+    const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024;
+    const screenshotSrc =
+      roast.screenshotBase64 && roast.screenshotBase64.length < MAX_SCREENSHOT_BYTES
+        ? `data:image/jpeg;base64,${roast.screenshotBase64}`
+        : null;
+
     const PAD_H = 80;
-    const PAD_V = 56;
-    const CAT_H = 460;
+    const PAD_V = 44;
+    // Cat grows to fill space above the text section; 640px is the max (~62% of H)
+    const CAT_MAX_H = 640;
 
     const img = new ImageResponse(
       (
@@ -57,131 +64,194 @@ export async function GET(
           style={{
             width: W,
             height: H,
-            background: '#000000',
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            paddingTop: PAD_V,
-            paddingBottom: PAD_V,
-            paddingLeft: PAD_H,
-            paddingRight: PAD_H,
+            position: 'relative',
             fontFamily: 'Inter',
+            overflow: 'hidden',
           }}
         >
-          {/* Cat image */}
-          <div
-            style={{
-              display: 'flex',
-              height: CAT_H,
-              width: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 36,
-              flexShrink: 0,
-            }}
-          >
-            {catSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={catSrc}
-                alt=""
-                style={{
-                  height: CAT_H,
-                  maxWidth: '100%',
-                  objectFit: 'contain',
-                  display: 'flex',
-                }}
-              />
-            ) : (
-              <div style={{ height: CAT_H, display: 'flex' }} />
-            )}
-          </div>
-
-          {/* Tier name · Score% COOKED */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-end',
-              marginBottom: 20,
-              flexShrink: 0,
-            }}
-          >
-            <span
+          {/* LAYER 1 — website screenshot */}
+          {screenshotSrc && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={screenshotSrc}
+              alt=""
               style={{
-                fontSize: 60,
-                fontWeight: 700,
-                color: '#FF3B30',
-                letterSpacing: 4,
-                lineHeight: 1,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'top',
+                display: 'flex',
               }}
-            >
-              {tier.name}
-            </span>
-            <span
-              style={{
-                fontSize: 60,
-                fontWeight: 700,
-                color: '#ffffff',
-                letterSpacing: 2,
-                lineHeight: 1,
-                marginLeft: 20,
-              }}
-            >
-              · {roast.score}% COOKED
-            </span>
-          </div>
+            />
+          )}
 
-          {/* Divider */}
+          {/* LAYER 2 — dark overlay */}
           <div
             style={{
-              width: '100%',
-              height: 1,
-              background: 'rgba(255,255,255,0.15)',
-              marginBottom: 24,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: W,
+              height: H,
+              background: screenshotSrc ? 'rgba(0,0,0,0.65)' : '#000000',
               display: 'flex',
-              flexShrink: 0,
             }}
           />
 
-          {/* Roast text */}
+          {/* LAYER 3 — content */}
           <div
             style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: W,
+              height: H,
               display: 'flex',
-              width: '100%',
-              justifyContent: 'center',
-              marginBottom: 32,
-              flexGrow: 1,
+              flexDirection: 'column',
+              alignItems: 'center',
+              paddingTop: PAD_V,
+              paddingBottom: PAD_V,
+              paddingLeft: PAD_H,
+              paddingRight: PAD_H,
+              overflow: 'hidden',
             }}
           >
-            <span
+            {/* Cat — flexGrow fills available space above text, capped at CAT_MAX_H */}
+            <div
               style={{
-                fontSize: 36,
-                fontWeight: 600,
-                color: '#ffffff',
-                textAlign: 'center',
-                lineHeight: 1.55,
+                display: 'flex',
+                flexGrow: 1,
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 0,
+                marginBottom: 28,
               }}
             >
-              &ldquo;{roast.roast}&rdquo;
-            </span>
-          </div>
+              {catSrc && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={catSrc}
+                  alt=""
+                  style={{
+                    maxHeight: CAT_MAX_H,
+                    maxWidth: '100%',
+                    objectFit: 'contain',
+                    display: 'flex',
+                  }}
+                />
+              )}
+            </div>
 
-          {/* Footer */}
-          <div
-            style={{
-              display: 'flex',
-              width: '100%',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <span style={{ fontSize: 22, fontWeight: 600, color: 'rgba(255,255,255,0.25)' }}>
-              {roast.domain}
-            </span>
-            <span style={{ fontSize: 22, fontWeight: 600, color: 'rgba(255,255,255,0.25)' }}>
-              getroasted.wtf
-            </span>
+            {/* Text section — pinned to bottom */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                flexShrink: 0,
+              }}
+            >
+              {/* Tier · Score% COOKED */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  marginBottom: 14,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 78,
+                    fontWeight: 700,
+                    color: '#FF3B30',
+                    letterSpacing: 4,
+                    lineHeight: 1,
+                  }}
+                >
+                  {tier.name}
+                </span>
+                <span
+                  style={{
+                    fontSize: 78,
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    letterSpacing: 2,
+                    lineHeight: 1,
+                    marginLeft: 20,
+                  }}
+                >
+                  · {roast.score}% COOKED
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div
+                style={{
+                  width: '100%',
+                  height: 1,
+                  background: 'rgba(255,255,255,0.2)',
+                  marginBottom: 20,
+                  display: 'flex',
+                  flexShrink: 0,
+                }}
+              />
+
+              {/* Roast text */}
+              <div
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  marginBottom: 20,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 44,
+                    fontWeight: 600,
+                    color: '#ffffff',
+                    lineHeight: 1.5,
+                    textAlign: 'center',
+                    width: '100%',
+                  }}
+                >
+                  &ldquo;{roast.roast}&rdquo;
+                </span>
+              </div>
+
+              {/* Footer */}
+              <div
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.3)',
+                  }}
+                >
+                  {roast.domain}
+                </span>
+                <span
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.3)',
+                  }}
+                >
+                  getroasted.wtf
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       ),
