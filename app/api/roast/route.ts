@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { saveRoast } from '@/lib/store';
 import type { RoastResult } from '@/lib/types';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { validateToken, validateCookieValue } from '@/lib/admin-bypass';
 import { getRarity, CHARACTERS } from '@/lib/rarity';
 import { takeScreenshot } from '@/lib/screenshot';
 
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-real-ip') ??
     'unknown';
 
-  let body: { url?: unknown; ownershipConfirmed?: unknown };
+  let body: { url?: unknown; ownershipConfirmed?: unknown; bypass?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -127,18 +128,30 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Rate limiting
-  const { allowed, resetAt } = await checkRateLimit(ip);
-  if (!allowed) {
-    console.warn(`[ABUSE] rate_limit_exceeded from ${ip}`);
-    return Response.json(
-      {
-        error: 'limit_reached',
-        message: "You've used your 3 free roasts today. Come back tomorrow for 3 more.",
-        resetAt,
-      },
-      { status: 429 },
-    );
+  // Admin bypass check — skip rate limiting for valid token or cookie
+  const bypassParam = typeof body.bypass === 'string' ? body.bypass : null;
+  const adminCookie = request.cookies.get('admin_bypass')?.value ?? null;
+  const isCookieValid = validateCookieValue(adminCookie);
+  const isParamValid = validateToken(bypassParam);
+  const isAdminBypass = isCookieValid || isParamValid;
+
+  if (isAdminBypass) {
+    const method = isCookieValid ? 'cookie' : 'param';
+    console.log(`[ADMIN_BYPASS] method=${method} ip=${ip}`);
+  } else {
+    // Rate limiting
+    const { allowed, resetAt } = await checkRateLimit(ip);
+    if (!allowed) {
+      console.warn(`[ABUSE] rate_limit_exceeded from ${ip}`);
+      return Response.json(
+        {
+          error: 'limit_reached',
+          message: "You've used your 3 free roasts today. Come back tomorrow for 3 more.",
+          resetAt,
+        },
+        { status: 429 },
+      );
+    }
   }
 
   const { url } = body;
