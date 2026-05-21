@@ -169,11 +169,20 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-real-ip') ??
     'unknown';
 
-  let body: { url?: unknown };
+  let body: { url?: unknown; ownershipConfirmed?: unknown };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: 'Invalid request body.' }, { status: 400 });
+  }
+
+  // Ownership confirmation
+  if (body.ownershipConfirmed !== true) {
+    console.warn(`[OWNERSHIP_FAIL] ${ip}`);
+    return Response.json(
+      { error: 'ownership_required', message: 'Please confirm ownership before roasting.' },
+      { status: 400 },
+    );
   }
 
   // Rate limiting
