@@ -21,4 +21,5 @@ export interface RoastResult {
   characterDescription: string;
   createdAt: number;
   screenshotBase64?: string;
+  screenshotFailed?: boolean;
 }

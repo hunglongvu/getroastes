@@ -9,6 +9,48 @@ import { takeScreenshot } from '@/lib/screenshot';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+const DOMAIN_ONLY_SYSTEM_PROMPT = `you are a brutally honest friend roasting a startup's domain name. you have NOT seen their actual page — no screenshot, no content, no design. roast the DOMAIN NAME ONLY.
+
+WHAT YOU KNOW
+- the domain name
+- the TLD (.app, .io, .space, .xyz, .so, .wtf, .co, .dev, etc.)
+
+WHAT YOU CANNOT KNOW — DO NOT REFERENCE
+- page copy, headlines, taglines, CTAs
+- design, layout, colors, fonts
+- number of features, sections, buttons
+- what the product actually does
+
+ROAST TARGETS
+1. TLD desperation: .space / .xyz / .app when .com was clearly taken. .io to sound technical. .so / .wtf as a personality substitute.
+2. generic SaaS nouns: "retention", "velocity", "scale", "flow", "sync", "loop", "layer", "stack" — means everything, tells you nothing
+3. compound word soup: two boring words smashed together ("launchdock", "growthflow", "syncloop")
+4. AI-generated startup energy: name sounds like it came from a startup name generator
+5. aspirational overreach: "apex", "nova", "nexus" for what's probably a B2B SaaS tool nobody asked for
+
+PATTERNS
+quote the domain directly. mock the TLD choice. call out the naming convention.
+
+EXAMPLES
+"launchdock.space — couldn't get .com, .io, .co, AND .dev? that's a speedrun of bad domain decisions"
+"postel.app sounds like you couldn't afford the .com for your postal service startup"
+"naming your company 'retention' is the most b2b saas thing i've ever seen"
+"syncloop.io: two meaningless words, one disposable TLD, zero explanation"
+
+RULES
+- 10-20 words
+- quote the actual domain or TLD directly
+- NO claims about page content, design, copy, or features
+- no celebrities, no pop culture
+- confident, not apologetic
+
+SCORING
+you haven't seen the site. default to 50-75 range. avoid extremes — you don't have the evidence.
+
+OUTPUT
+return ONLY valid JSON, no markdown, no backticks:
+{"score": integer 0-100, "roastLine": "your roast, lowercase, 10-20 words, no period at end"}`;
+
 const SYSTEM_PROMPT = `you are a brutally honest friend roasting someone's landing page. you sound like a real person with attitude — casual, sharp, specific. not a corporate AI, not a child.
 
 VOICE
@@ -177,13 +219,16 @@ export async function POST(request: NextRequest) {
         controller.enqueue(sse({ type: 'progress', message: 'taking screenshot...' }));
 
         let screenshot: { base64: string; mediaType: 'image/jpeg' } | null = null;
+        let screenshotFailed = false;
         try {
           screenshot = await takeScreenshot(normalized);
         } catch (err) {
           console.warn(`[SCREENSHOT_FAIL] ${normalized} — ${err instanceof Error ? err.message : String(err)}`);
-          // Continue without screenshot — card renders fallback background
+          screenshotFailed = true;
+          // Continue without screenshot — domain-only roast path
         }
 
+        console.log(`[ROAST_PATH] type=${screenshotFailed ? 'domain_only' : 'screenshot'} url=${normalized}`);
         controller.enqueue(sse({ type: 'progress', message: 'roasting your page...' }));
 
         let aiData: AiResponse;
@@ -203,13 +248,13 @@ export async function POST(request: NextRequest) {
                   text: `roast this landing page like a brutally honest friend on Twitter.\n\nurl: ${normalized}\ndomain: ${domain}\n\nlook at the screenshot and identify:\n- the EXACT words in the main headline (you will reference or quote these)\n- CTA button text\n- how many features, sections, or CTAs are crammed in\n- any buzzwords: "revolutionary", "AI-powered", "seamless", "next-gen", etc.\n- whether you can tell what the product actually does in 3 seconds\n- anything visually weird: stock photos, confusing layout, too many things\n\nwrite ONE roast (10-20 words) with a casual, confident voice. quote something specific from the page or name a specific element. sounds like a tweet.\n\nscore honestly (full 0-100 range). return only valid JSON.`,
                 },
               ]
-            : `roast this landing page like a brutally honest friend — no screenshot available, work with the domain name only.\n\nurl: ${normalized}\ndomain: ${domain}\n\nroast the domain name itself: what it sounds like, what the extension (.so/.ai/.xyz) signals about the founder, what kind of product this name implies. casual confident voice, 10-20 words, quote the domain directly.\n\nscore harshly since they didn't even let us see the page (70-95 range). return only valid JSON.`;
+            : `roast this startup's domain name. you have NOT seen their actual page.\n\nurl: ${normalized}\ndomain: ${domain}\n\ndomain breakdown:\n- name part: "${domain.split('.')[0]}"\n- TLD: ".${domain.split('.').slice(1).join('.')}"\n\nroast what the domain signals: is it generic SaaS-speak? a forced compound? a desperate TLD choice? sounds AI-generated? quote the domain or TLD directly. no claims about page content.\n\nscore 50-75 range. return only valid JSON.`;
 
           const message = await client.messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 200,
             temperature: 1.0,
-            system: SYSTEM_PROMPT,
+            system: screenshotFailed ? DOMAIN_ONLY_SYSTEM_PROMPT : SYSTEM_PROMPT,
             messages: [{ role: 'user', content: userContent }],
           });
 
@@ -241,6 +286,7 @@ export async function POST(request: NextRequest) {
           characterDescription: character.description,
           createdAt: Date.now(),
           screenshotBase64: screenshot?.base64,
+          screenshotFailed,
         };
 
         await saveRoast(result);

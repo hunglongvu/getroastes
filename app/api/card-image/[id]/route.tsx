@@ -308,16 +308,16 @@ export async function GET(
                   getroasted.wtf
                 </span>
               </div>
-              {!screenshotSrc && (
+              {roast.screenshotFailed && (
                 <span
                   style={{
                     fontSize: 18,
                     fontWeight: 400,
-                    color: 'rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.15)',
                     letterSpacing: 1,
                   }}
                 >
-                  // screenshot unavailable
+                  // domain roast only — site was unreachable
                 </span>
               )}
             </div>

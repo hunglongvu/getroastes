@@ -176,12 +176,26 @@ export default function RoastResult({
               fontWeight: 600,
               color: '#ffffff',
               lineHeight: 1.5,
-              marginBottom: 32,
+              marginBottom: roast.screenshotFailed ? 8 : 32,
               minHeight: 88,
             }}
           >
             {typedText}
             {!typingDone && <span className="roast-cursor">_</span>}
+          </p>
+        )}
+
+        {/* Domain-only notice */}
+        {showRoast && roast.screenshotFailed && (
+          <p
+            style={{
+              fontFamily: 'monospace',
+              fontSize: 11,
+              color: 'rgba(255,255,255,0.3)',
+              marginBottom: 24,
+            }}
+          >
+            // roast based on domain only (we couldn&apos;t reach your site)
           </p>
         )}
 
