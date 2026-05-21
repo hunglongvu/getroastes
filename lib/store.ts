@@ -17,6 +17,7 @@ export async function saveRoast(result: RoastResult): Promise<void> {
     tags: result.tags,
     excluded: false,
     screenshot_base64: result.screenshotBase64 ?? null,
+    screenshot_failed: result.screenshotFailed ?? false,
   });
   if (error) console.error('saveRoast error:', error.message, error.details);
 }
@@ -44,6 +45,7 @@ export async function getRoast(id: string): Promise<RoastResult | null> {
     tags: data.tags,
     createdAt: new Date(data.created_at).getTime(),
     screenshotBase64: data.screenshot_base64 ?? undefined,
+    screenshotFailed: data.screenshot_failed ?? false,
   };
 }
 
