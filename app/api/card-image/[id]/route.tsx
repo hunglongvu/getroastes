@@ -39,10 +39,10 @@ const TEXT_SHADOW = '0 0 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7), 0 2px 8
 
 function getQuoteFontSize(text: string): number {
   const length = text.length;
-  if (length < 60) return 48;
-  if (length < 120) return 40;
-  if (length < 180) return 34;
-  return 30;
+  if (length < 60)  return 60;
+  if (length < 120) return 50;
+  if (length < 180) return 42;
+  return 36;
 }
 
 export async function GET(
@@ -227,12 +227,14 @@ export async function GET(
                   fontSize: getQuoteFontSize(roastText),
                   fontWeight: 600,
                   color: '#ffffff',
-                  lineHeight: 1.5,
+                  lineHeight: 1.25,
                   textAlign: 'center',
                   textShadow: TEXT_SHADOW,
                 }}
               >
-                &ldquo;{roastText}&rdquo;
+                <span style={{ color: '#FF3B30' }}>&ldquo;</span>
+                {roastText}
+                <span style={{ color: '#FF3B30' }}>&rdquo;</span>
               </span>
             </div>
 
