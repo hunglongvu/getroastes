@@ -171,12 +171,12 @@ export default async function RoastPage({
             className="order-1 md:order-2"
             style={{ flex: '1 1 0', minWidth: 0 }}
           >
-            <div className="md:sticky" style={{ top: 24 }}>
+            <div className="md:sticky card-preview-wrapper" style={{ top: 24 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/api/card-image/${roast.id}`}
                 alt={`roast card for ${roast.domain}`}
-                style={{ width: '100%', borderRadius: 12, display: 'block' }}
+                style={{ width: '100%', borderRadius: 8, display: 'block' }}
               />
             </div>
           </div>
