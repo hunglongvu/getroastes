@@ -84,37 +84,65 @@ export async function GET(
             overflow: 'hidden',
           }}
         >
-          {/* LAYER 1 — website screenshot */}
-          {screenshotSrc && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={screenshotSrc}
-              alt=""
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'top',
-                display: 'flex',
-              }}
-            />
+          {screenshotSrc ? (
+            <>
+              {/* LAYER 1a — website screenshot */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={screenshotSrc}
+                alt=""
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'top',
+                  display: 'flex',
+                }}
+              />
+              {/* LAYER 1b — dark overlay */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: W,
+                  height: H,
+                  background: 'rgba(0,0,0,0.65)',
+                  display: 'flex',
+                }}
+              />
+            </>
+          ) : (
+            <>
+              {/* LAYER 1a — fallback: deep dark base */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: W,
+                  height: H,
+                  background: 'linear-gradient(160deg, #0f0f0f 0%, #080808 55%, #0c0a0a 100%)',
+                  display: 'flex',
+                }}
+              />
+              {/* LAYER 1b — fallback: subtle red glow at cat position */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: W,
+                  height: H,
+                  background: 'radial-gradient(ellipse 1000px 700px at 50% 35%, rgba(255,59,48,0.06) 0%, transparent 65%)',
+                  display: 'flex',
+                }}
+              />
+            </>
           )}
-
-          {/* LAYER 2 — dark overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: W,
-              height: H,
-              background: screenshotSrc ? 'rgba(0,0,0,0.65)' : '#000000',
-              display: 'flex',
-            }}
-          />
 
           {/* LAYER 3 — content */}
           <div
@@ -240,36 +268,58 @@ export async function GET(
             {/* Spacer — pushes footer to bottom */}
             <div style={{ flexGrow: 1 }} />
 
-            {/* Footer — domain left, brand right */}
+            {/* Footer */}
             <div
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 width: '100%',
-                justifyContent: 'space-between',
                 alignItems: 'center',
+                gap: 8,
                 flexShrink: 0,
               }}
             >
-              <span
+              <div
                 style={{
-                  fontSize: 22,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.3)',
-                  textShadow: TEXT_SHADOW,
+                  display: 'flex',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
-                {roast.domain}
-              </span>
-              <span
-                style={{
-                  fontSize: 22,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.3)',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                getroasted.wtf
-              </span>
+                <span
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.3)',
+                    textShadow: TEXT_SHADOW,
+                  }}
+                >
+                  {roast.domain}
+                </span>
+                <span
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.3)',
+                    textShadow: TEXT_SHADOW,
+                  }}
+                >
+                  getroasted.wtf
+                </span>
+              </div>
+              {!screenshotSrc && (
+                <span
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 400,
+                    color: 'rgba(255,255,255,0.1)',
+                    letterSpacing: 1,
+                  }}
+                >
+                  // screenshot unavailable
+                </span>
+              )}
             </div>
           </div>
         </div>

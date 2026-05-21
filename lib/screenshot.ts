@@ -22,13 +22,21 @@ export async function takeScreenshot(
   });
 
   if (!response.ok) {
-    const errorResponse = await response.text().catch(() => '(unreadable)');
-    console.error('Screenshot failed:', response.status, errorResponse);
-    throw new Error(`Screenshot failed: HTTP ${response.status}`);
+    const errorBody = await response.text().catch(() => '(unreadable)');
+    // Classify common failure modes for monitoring
+    const reason =
+      response.status === 403 ? 'bot-blocked (403)' :
+      response.status === 422 ? 'invalid-url (422)' :
+      response.status === 429 ? 'rate-limited (429)' :
+      response.status === 504 ? 'upstream-timeout (504)' :
+      `http-${response.status}`;
+    console.error(`[SCREENSHOT_FAIL] reason=${reason} url=${url} body=${errorBody.slice(0, 200)}`);
+    throw new Error(`Screenshot failed: ${reason}`);
   }
 
   const buffer = await response.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
-  console.log('Screenshot base64 length:', base64.length, 'bytes (~', Math.round(base64.length / 1024), 'KB)');
+  const kb = Math.round(base64.length / 1024);
+  console.log(`[SCREENSHOT_OK] url=${url} size=${kb}KB`);
   return { base64, mediaType: 'image/jpeg' };
 }

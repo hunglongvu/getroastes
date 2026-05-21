@@ -166,8 +166,9 @@ export async function POST(request: NextRequest) {
         let screenshot: { base64: string; mediaType: 'image/jpeg' } | null = null;
         try {
           screenshot = await takeScreenshot(normalized);
-        } catch {
-          // Continue without screenshot — card uses solid dark background
+        } catch (err) {
+          console.warn(`[SCREENSHOT_FAIL] ${normalized} — ${err instanceof Error ? err.message : String(err)}`);
+          // Continue without screenshot — card renders fallback background
         }
 
         controller.enqueue(sse({ type: 'progress', message: 'roasting your page...' }));
