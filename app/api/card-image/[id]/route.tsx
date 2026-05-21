@@ -34,6 +34,7 @@ export async function GET(
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
+            border: '2px solid rgba(255,255,255,0.15)',
           }}
         >
           {/* LAYER 1 — screenshot */}
