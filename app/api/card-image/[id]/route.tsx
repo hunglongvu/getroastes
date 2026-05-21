@@ -86,19 +86,17 @@ export async function GET(
         >
           {screenshotSrc ? (
             <>
-              {/* LAYER 1a — website screenshot */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={screenshotSrc}
-                alt=""
+              {/* LAYER 1a — website screenshot via backgroundImage (Satori silently drops <img> with large data URIs) */}
+              <div
                 style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'top',
+                  width: W,
+                  height: H,
+                  backgroundImage: `url("${screenshotSrc}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'top center',
                   display: 'flex',
                 }}
               />
@@ -129,15 +127,15 @@ export async function GET(
                   display: 'flex',
                 }}
               />
-              {/* LAYER 1b — fallback: subtle red glow at cat position */}
+              {/* LAYER 1b — fallback: red glow via box-shadow (radial-gradient with 'transparent' broken in Satori) */}
               <div
                 style={{
                   position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: W,
-                  height: H,
-                  background: 'radial-gradient(ellipse 1000px 700px at 50% 35%, rgba(255,59,48,0.06) 0%, transparent 65%)',
+                  top: Math.round(H * 0.35),
+                  left: Math.round(W * 0.5),
+                  width: 0,
+                  height: 0,
+                  boxShadow: '0 0 500px 380px rgba(255,59,48,0.07)',
                   display: 'flex',
                 }}
               />
