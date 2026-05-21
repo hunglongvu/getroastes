@@ -105,6 +105,83 @@ body {
   text-decoration: underline;
 }
 
+.cookie-notice {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 59, 48, 0.5);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  animation: slideUp 0.4s ease-out;
+}
+
+.cookie-notice-text {
+  text-transform: lowercase;
+}
+
+.cookie-notice-link {
+  color: #FF3B30;
+  text-decoration: none;
+  text-transform: lowercase;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.cookie-notice-link:hover {
+  border-bottom-color: #FF3B30;
+}
+
+.cookie-notice-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 6px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  text-transform: lowercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.cookie-notice-button:hover {
+  border-color: #FF3B30;
+  color: #FF3B30;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .cookie-notice {
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 20px;
+    text-align: center;
+  }
+  .cookie-notice-text {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-notice {
+    animation: none;
+  }
+}
+
 .pokemon-card {
   position: relative;
 }

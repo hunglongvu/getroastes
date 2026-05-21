@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CookieNotice from './components/CookieNotice';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-black">
         {children}
+        <CookieNotice />
         <footer style={{ textAlign: 'center', padding: '20px', borderTop: '1px solid #111' }}>
           <span className="font-mono text-xs" style={{ color: '#333' }}>
             <a href="/imprint" style={{ color: '#333', textDecoration: 'none' }} className="hover:text-zinc-500 transition-colors">Imprint</a>
