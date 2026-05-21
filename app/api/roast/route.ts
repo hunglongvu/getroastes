@@ -110,42 +110,39 @@ export async function POST(request: NextRequest) {
       try {
         controller.enqueue(sse({ type: 'progress', message: 'taking screenshot...' }));
 
-        let screenshot: { base64: string; mediaType: 'image/jpeg' };
+        let screenshot: { base64: string; mediaType: 'image/jpeg' } | null = null;
         try {
           screenshot = await takeScreenshot(normalized);
         } catch {
-          controller.enqueue(sse({ type: 'error', error: "Could not screenshot this URL. Check it's public and try again." }));
-          controller.close();
-          return;
+          // Continue without screenshot — card uses solid dark background
         }
 
         controller.enqueue(sse({ type: 'progress', message: 'roasting your page...' }));
 
         let aiData: AiResponse;
         try {
+          const userContent = screenshot
+            ? [
+                {
+                  type: 'image' as const,
+                  source: {
+                    type: 'base64' as const,
+                    media_type: screenshot.mediaType,
+                    data: screenshot.base64,
+                  },
+                },
+                {
+                  type: 'text' as const,
+                  text: `Roast this SaaS landing page. URL: ${normalized} (domain: ${domain})\n\nScore it, roast it, and return only valid JSON.`,
+                },
+              ]
+            : `Roast this SaaS landing page based on its domain name and URL alone — no screenshot available. URL: ${normalized} (domain: ${domain})\n\nScore it, roast it, and return only valid JSON.`;
+
           const message = await client.messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 1024,
             system: SYSTEM_PROMPT,
-            messages: [
-              {
-                role: 'user',
-                content: [
-                  {
-                    type: 'image',
-                    source: {
-                      type: 'base64',
-                      media_type: screenshot.mediaType,
-                      data: screenshot.base64,
-                    },
-                  },
-                  {
-                    type: 'text',
-                    text: `Roast this SaaS landing page. URL: ${normalized} (domain: ${domain})\n\nScore it, roast it, and return only valid JSON.`,
-                  },
-                ],
-              },
-            ],
+            messages: [{ role: 'user', content: userContent }],
           });
 
           const content = message.content[0];
@@ -175,7 +172,7 @@ export async function POST(request: NextRequest) {
           characterEmoji: character.emoji,
           characterDescription: character.description,
           createdAt: Date.now(),
-          screenshotBase64: screenshot.base64,
+          screenshotBase64: screenshot?.base64,
         };
 
         await saveRoast(result);
