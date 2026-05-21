@@ -133,6 +133,17 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 pb-10 text-center">
+        <Link href="/imprint" className="font-mono text-zinc-700 text-xs hover:text-zinc-500 transition-colors">
+          imprint
+        </Link>
+        <span className="font-mono text-zinc-800 text-xs mx-2">·</span>
+        <Link href="/privacy" className="font-mono text-zinc-700 text-xs hover:text-zinc-500 transition-colors">
+          privacy
+        </Link>
+      </footer>
     </main>
   );
 }

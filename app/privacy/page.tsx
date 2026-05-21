@@ -1,79 +1,111 @@
 import Link from 'next/link';
 
+function Divider() {
+  return <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.07)', marginBottom: 40 }} />;
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 16 }}>
+      {children}
+    </h2>
+  );
+}
+
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '60px 24px' }}>
-        <Link href="/" className="font-mono text-sm text-zinc-500 hover:text-white transition-colors">
-          ← getroasted.wtf
-        </Link>
+    <main style={{ background: '#000000', minHeight: '100vh', color: '#ffffff' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '48px 24px 96px' }}>
 
-        <h1 className="font-mono font-bold text-2xl mt-10 mb-1" style={{ color: '#E24B4A' }}>
-          Privacy Policy
-        </h1>
-        <p className="font-mono text-xs text-zinc-600 mb-10">// Last updated: May 2026</p>
-
-        <div className="font-mono text-sm" style={{ lineHeight: 1.9 }}>
-
-          <section className="mb-8">
-            <p className="text-zinc-300 font-semibold mb-2">What we collect</p>
-            <ul className="list-none text-zinc-500 space-y-1">
-              <li>— URLs you submit for roasting</li>
-              <li>— AI-generated roast results (stored in our database)</li>
-              <li>— Screenshots of submitted URLs (via ScreenshotOne)</li>
-              <li>— IP addresses for rate limiting (not stored permanently)</li>
-            </ul>
-          </section>
-
-          <section className="mb-8">
-            <p className="text-zinc-300 font-semibold mb-2">Rate limiting</p>
-            <p className="text-zinc-500">
-              We use your IP address to enforce the daily free roast limit (3 per day).
-              IPs are held in memory only and are not written to a database or logs.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <p className="text-zinc-300 font-semibold mb-2">Third-party services</p>
-            <ul className="list-none text-zinc-500 space-y-1">
-              <li>— <span className="text-zinc-400">Vercel</span> — hosting (USA) · vercel.com/legal/privacy-policy</li>
-              <li>— <span className="text-zinc-400">Supabase</span> — database (EU) · supabase.com/privacy</li>
-              <li>— <span className="text-zinc-400">ScreenshotOne</span> — page screenshots · screenshotone.com/privacy-policy</li>
-              <li>— <span className="text-zinc-400">Anthropic</span> — AI analysis (USA) · anthropic.com/privacy</li>
-              <li>— <span className="text-zinc-400">Stripe</span> — payments (if applicable) · stripe.com/privacy</li>
-            </ul>
-          </section>
-
-          <section className="mb-8">
-            <p className="text-zinc-300 font-semibold mb-2">Cookies</p>
-            <p className="text-zinc-500">
-              We do not use tracking or analytics cookies. No cookie banner is shown
-              because no non-essential cookies are set.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <p className="text-zinc-300 font-semibold mb-2">Your rights</p>
-            <ul className="list-none text-zinc-500 space-y-1">
-              <li>— Request deletion of your roast from the Hall of Shame</li>
-              <li>— Request access to data we hold about you</li>
-              <li>— Opt out of public listing at any time</li>
-            </ul>
-            <p className="text-zinc-600 text-xs mt-3">
-              To exercise any of these rights, email us at the address below.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <p className="text-zinc-300 font-semibold mb-2">Contact</p>
-            <p className="text-zinc-500">
-              <a href="mailto:hello@getroasted.wtf" className="text-zinc-300 hover:text-white transition-colors">
-                hello@getroasted.wtf
-              </a>
-            </p>
-          </section>
-
+        <div style={{ marginBottom: 48 }}>
+          <Link
+            href="/"
+            style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}
+          >
+            ← getroasted.wtf
+          </Link>
         </div>
+
+        <h1 style={{ fontFamily: 'monospace', fontSize: 36, fontWeight: 800, color: '#FF3B30', marginBottom: 56, letterSpacing: 2 }}>
+          PRIVACY POLICY
+        </h1>
+
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>What we collect</SectionTitle>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 16 }}>
+            When you use getroasted.wtf, we collect:
+          </p>
+          <ul style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2.2, color: 'rgba(255,255,255,0.6)', paddingLeft: 0, listStyle: 'none' }}>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>IP address</strong> — used only for rate limiting (3 free roasts per IP per day). Automatically deleted after 24 hours.</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>URLs you submit for roasting</strong> — stored to display in Hall of Shame and Recent Roasts feed.</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Generated roasts</strong> — stored alongside the submitted URLs.</li>
+          </ul>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.6)', marginTop: 16 }}>
+            We do <strong style={{ color: '#FF3B30' }}>NOT</strong> collect:
+          </p>
+          <ul style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2.2, color: 'rgba(255,255,255,0.4)', paddingLeft: 0, listStyle: 'none' }}>
+            <li>— Names, emails, or personal information</li>
+            <li>— Tracking cookies</li>
+            <li>— Analytics data</li>
+            <li>— Location data</li>
+          </ul>
+        </section>
+
+        <Divider />
+
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>How we use it</SectionTitle>
+          <ul style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2.2, color: 'rgba(255,255,255,0.6)', paddingLeft: 0, listStyle: 'none' }}>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>IP addresses:</strong> rate limiting only, not for tracking</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.85)' }}>URLs + roasts:</strong> displayed publicly on the site</li>
+          </ul>
+        </section>
+
+        <Divider />
+
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>Third-party services</SectionTitle>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 16 }}>
+            We use:
+          </p>
+          <ul style={{ fontFamily: 'monospace', fontSize: 14, lineHeight: 2.4, color: 'rgba(255,255,255,0.5)', paddingLeft: 0, listStyle: 'none' }}>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Vercel</strong> (hosting) — vercel.com/legal/privacy-policy</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Anthropic Claude API</strong> (AI roast generation) — anthropic.com/legal/privacy</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Upstash Redis</strong> (rate limiting) — upstash.com/trust/privacy.pdf</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.8)' }}>ScreenshotOne</strong> (page screenshots) — screenshotone.com/privacy</li>
+            <li>— <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Cloudflare Turnstile</strong> (bot protection) — cloudflare.com/privacypolicy</li>
+          </ul>
+        </section>
+
+        <Divider />
+
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>Your rights (GDPR)</SectionTitle>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 16 }}>
+            You can request:
+          </p>
+          <ul style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2.2, color: 'rgba(255,255,255,0.6)', paddingLeft: 0, listStyle: 'none' }}>
+            <li>— Deletion of any roast involving your URL</li>
+            <li>— Information about data we have stored</li>
+            <li>— Correction of any data</li>
+          </ul>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.5)', marginTop: 16 }}>
+            Contact:{' '}
+            <a href="mailto:info@hunglongvu.com" style={{ color: '#FF3B30', textDecoration: 'none' }}>
+              info@hunglongvu.com
+            </a>
+          </p>
+        </section>
+
+        <Divider />
+
+        <section>
+          <SectionTitle>Changes</SectionTitle>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, lineHeight: 2, color: 'rgba(255,255,255,0.4)' }}>
+            We may update this policy. Last updated: May 21, 2026.
+          </p>
+        </section>
+
       </div>
     </main>
   );
