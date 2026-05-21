@@ -3,8 +3,8 @@ export const revalidate = 0;
 import Link from 'next/link';
 import { RoastForm } from './components/RoastForm';
 import { Embers } from './components/Embers';
-import { RoastCounter } from './components/RoastCounter';
 import { getHallOfShame } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 
 function scoreColor(score: number): string {
   if (score >= 80) return '#ff4444';
@@ -15,7 +15,11 @@ function scoreColor(score: number): string {
 }
 
 export default async function HomePage() {
-  const topShame = await getHallOfShame(5);
+  const [topShame, { count: roastCount }] = await Promise.all([
+    getHallOfShame(5),
+    supabase.from('roasts').select('*', { count: 'exact', head: true }),
+  ]);
+  const spotsTaken = Math.min(roastCount ?? 0, 100);
 
   return (
     <main className="relative min-h-screen bg-black text-white">
@@ -24,7 +28,7 @@ export default async function HomePage() {
       {/* 1 · Hero */}
       <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-6 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
-          <span style={{ color: 'rgba(255,255,255,0.7)' }} className="fade-in">First the AI roasts you.</span>
+          <span style={{ color: 'rgba(255,255,255,0.7)' }} className="fade-in">I think your landing page sucks.</span>
           <br />
           <span
             style={{
@@ -33,7 +37,7 @@ export default async function HomePage() {
             }}
             className="fade-in-delay-1"
           >
-            Then the internet does.
+            Prove me wrong.
           </span>
         </h1>
 
@@ -48,7 +52,11 @@ export default async function HomePage() {
         <p className="mt-5 text-zinc-600 text-xs font-mono fade-in-delay-4">
           3 free roasts/day · no signup · no mercy
         </p>
-        <RoastCounter />
+        <p className="font-mono text-sm mt-4 fade-in-delay-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          🔥{' '}
+          <span style={{ color: '#ff8c00', fontWeight: 700 }}>{spotsTaken}</span>
+          {' '}of 100 founding spots taken
+        </p>
       </section>
 
       {/* 2 · Hall of Shame preview */}
