@@ -31,10 +31,10 @@ function ShareModal({ tweetUrl, onClose }: { tweetUrl: string; onClose: () => vo
           card downloaded 🔥
         </p>
         <p style={{ fontFamily: 'monospace', fontSize: 13, color: '#ff4444', margin: '0 0 16px' }}>
-          // attach the image or it&apos;s just words
+          // don&apos;t forget to attach the image
         </p>
         <p style={{ fontSize: 15, color: '#888', lineHeight: 1.6, margin: '0 0 28px' }}>
-          tweet is pre-filled with your url + score. attach the card so they can see exactly how cooked you are.
+          attach the downloaded card to your tweet so people can see exactly how cooked you are.
         </p>
         <button
           onClick={openTweet}
@@ -72,17 +72,10 @@ export function ShareButton({ data }: { data: RoastResult }) {
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    // Strip any quote chars the model may have wrapped the roast in
-    const roastClean = data.roast.replace(/^[""''"']+|[""''"']+$/g, '').trim();
-    // Twitter counts any URL-like token in text as 23 chars, and the url= param as 23 chars.
-    // Fixed tokens: domain(23) + " got roasted at "(16) + score(≤3) + "% cooked\n\n\""(12) + "\""(1) = ~55
-    // url param = 23. Budget for roast quote ≈ 280 - 55 - 23 = 202 chars.
-    const MAX_ROAST = 200;
-    const roastSnippet = roastClean.length > MAX_ROAST
-      ? roastClean.slice(0, MAX_ROAST).replace(/\s\S*$/, '') + '…'
-      : roastClean;
-    const tweetText = `${data.domain} got roasted at ${data.score}% cooked\n\n"${roastSnippet}"`;
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent('https://getroasted.wtf')}`;
+    const tweetText = data.score >= 50
+      ? `asked an AI to roast my landing page. didn't expect it to be this personal.\n\n${data.roast}\n\nyours would be worse. getroasted.wtf`
+      : `asked an AI to roast my landing page. it went easier than expected.\n\n${data.roast}\n\nyours would not. getroasted.wtf`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
 
     try {
       const response = await fetch(`/api/card-image/${data.id}`);
