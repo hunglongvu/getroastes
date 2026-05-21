@@ -2,8 +2,28 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { TerminalAnimation } from './TerminalAnimation';
 import type { RoastResult } from '@/lib/types';
+
+declare global {
+  interface Window {
+    turnstile: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          size?: 'normal' | 'compact' | 'invisible';
+          callback?: (token: string) => void;
+          'expired-callback'?: () => void;
+          'error-callback'?: () => void;
+        },
+      ) => string;
+      reset: (widgetId: string) => void;
+      execute: (widgetId: string) => void;
+    };
+  }
+}
 
 function extractDomain(raw: string): string {
   let normalized = raw.trim();
@@ -23,10 +43,42 @@ export function RoastForm() {
   const [animating, setAnimating] = useState(false);
   const [domain, setDomain] = useState('');
   const [apiReady, setApiReady] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
 
   const router = useRouter();
   const resultRef = useRef<RoastResult | null>(null);
   const navigatedRef = useRef(false);
+
+  // Turnstile refs
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+  const tokenCallbackRef = useRef<((token: string) => void) | null>(null);
+
+  function initTurnstile() {
+    const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!sitekey || !turnstileContainerRef.current || widgetIdRef.current) return;
+    widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+      sitekey,
+      size: 'invisible',
+      callback: (token: string) => {
+        if (tokenCallbackRef.current) {
+          tokenCallbackRef.current(token);
+          tokenCallbackRef.current = null;
+        }
+      },
+      'expired-callback': () => {
+        if (widgetIdRef.current) window.turnstile.reset(widgetIdRef.current);
+      },
+    });
+  }
+
+  async function getTurnstileToken(): Promise<string | null> {
+    if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || !widgetIdRef.current) return null;
+    return new Promise<string>((resolve) => {
+      tokenCallbackRef.current = resolve;
+      window.turnstile.execute(widgetIdRef.current!);
+    });
+  }
 
   function navigate(result: RoastResult) {
     if (navigatedRef.current) return;
@@ -41,22 +93,29 @@ export function RoastForm() {
     const d = extractDomain(url);
     setDomain(d);
     setError('');
+    setRateLimited(false);
     setApiReady(false);
     setAnimating(true);
     resultRef.current = null;
     navigatedRef.current = false;
 
     try {
+      const turnstileToken = await getTurnstileToken();
+
       const res = await fetch('/api/roast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({ url: url.trim(), turnstileToken }),
       });
 
       if (!res.ok) {
-        const data: { error?: string } = await res.json();
+        const data: { error?: string; message?: string } = await res.json();
         setAnimating(false);
-        setError(data.error ?? 'Something went wrong. Try again.');
+        if (data.error === 'limit_reached') {
+          setRateLimited(true);
+        } else {
+          setError(data.message ?? data.error ?? 'Something went wrong. Try again.');
+        }
         return;
       }
 
@@ -103,13 +162,61 @@ export function RoastForm() {
     if (resultRef.current) {
       navigate(resultRef.current);
     }
-    // If no result yet, TerminalAnimation is in 'waiting' phase;
-    // once apiReady flips, it calls onDone again via its own useEffect.
+  }
+
+  if (rateLimited) {
+    return (
+      <div
+        className="w-full max-w-xl mx-auto"
+        style={{
+          border: '1px solid rgba(255,59,48,0.3)',
+          borderRadius: 10,
+          padding: '28px 32px',
+          background: 'rgba(255,59,48,0.05)',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          className="font-mono font-bold mb-3"
+          style={{ fontSize: 16, color: '#ffffff' }}
+        >
+          you&apos;ve been roasted enough today.
+        </p>
+        <p className="font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
+          come back tomorrow or →
+        </p>
+        <a
+          href="#waitlist"
+          className="font-mono text-sm"
+          style={{
+            display: 'inline-block',
+            padding: '10px 20px',
+            border: '1px solid rgba(255,59,48,0.5)',
+            borderRadius: 6,
+            color: '#FF3B30',
+            textDecoration: 'none',
+          }}
+        >
+          join waitlist for unlimited
+        </a>
+      </div>
+    );
   }
 
   return (
     <>
+      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="lazyOnload"
+          onLoad={initTurnstile}
+        />
+      )}
+
       <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto">
+        {/* Invisible Turnstile container */}
+        <div ref={turnstileContainerRef} style={{ display: 'none' }} />
+
         <div className="flex gap-2">
           <input
             type="text"

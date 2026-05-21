@@ -144,25 +144,68 @@ function sse(data: object): Uint8Array {
   return new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`);
 }
 
+async function validateTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // disabled in dev when key not set
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, response: token, remoteip: ip }),
+    });
+    const data = await res.json() as { success: boolean };
+    return data.success;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
     request.headers.get('x-real-ip') ??
-    '127.0.0.1';
+    'unknown';
 
-  const { allowed } = checkRateLimit(ip);
-  if (!allowed) {
-    return Response.json(
-      { error: 'Daily limit reached. Payments coming soon!' },
-      { status: 429 }
-    );
-  }
-
-  let body: { url?: unknown };
+  let body: { url?: unknown; turnstileToken?: unknown };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: 'Invalid request body.' }, { status: 400 });
+  }
+
+  // Turnstile bot protection
+  const turnstileToken = typeof body.turnstileToken === 'string' ? body.turnstileToken : '';
+  const turnstileRequired = !!process.env.TURNSTILE_SECRET_KEY;
+  if (turnstileRequired && !turnstileToken) {
+    console.warn(`[ABUSE] missing_turnstile_token from ${ip}`);
+    return Response.json(
+      { error: 'bot_detected', message: 'Bot protection failed. Please refresh and try again.' },
+      { status: 403 },
+    );
+  }
+  if (turnstileToken) {
+    const valid = await validateTurnstile(turnstileToken, ip);
+    if (!valid) {
+      console.warn(`[ABUSE] turnstile_failed from ${ip}`);
+      return Response.json(
+        { error: 'bot_detected', message: 'Bot protection failed. Please refresh and try again.' },
+        { status: 403 },
+      );
+    }
+  }
+
+  // Rate limiting
+  const { allowed, resetAt } = await checkRateLimit(ip);
+  if (!allowed) {
+    console.warn(`[ABUSE] rate_limit_exceeded from ${ip}`);
+    return Response.json(
+      {
+        error: 'limit_reached',
+        message: "You've used your 3 free roasts today. Come back tomorrow or join the waitlist.",
+        resetAt,
+      },
+      { status: 429 },
+    );
   }
 
   const { url } = body;

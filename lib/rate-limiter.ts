@@ -1,36 +1,22 @@
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
-declare global {
-  // eslint-disable-next-line no-var
-  var _rateLimitStore: Map<string, RateLimitEntry> | undefined;
-}
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
-const store: Map<string, RateLimitEntry> =
-  global._rateLimitStore ?? new Map<string, RateLimitEntry>();
+// fixedWindow boundaries align with midnight UTC (days since Unix epoch)
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(3, '1 d'),
+  prefix: 'roast:ip',
+});
 
-if (process.env.NODE_ENV !== 'production') {
-  global._rateLimitStore = store;
-}
-
-const MAX_ROASTS = 3;
-const WINDOW_MS = 24 * 60 * 60 * 1000;
-
-export function checkRateLimit(ip: string): { allowed: boolean } {
-  const now = Date.now();
-  const entry = store.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    store.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return { allowed: true };
-  }
-
-  if (entry.count >= MAX_ROASTS) {
-    return { allowed: false };
-  }
-
-  entry.count++;
-  return { allowed: true };
+export async function checkRateLimit(ip: string): Promise<{
+  allowed: boolean;
+  resetAt: string;
+}> {
+  const { success, reset } = await ratelimit.limit(ip);
+  return { allowed: success, resetAt: new Date(reset).toISOString() };
 }
