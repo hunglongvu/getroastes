@@ -1,29 +1,12 @@
 'use client';
 
+// TODO: Re-enable Turnstile after debugging Cloudflare domain setup.
+// Rate limiting (3/IP/day) provides interim bot protection.
+
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Script from 'next/script';
 import { TerminalAnimation } from './TerminalAnimation';
 import type { RoastResult } from '@/lib/types';
-
-declare global {
-  interface Window {
-    turnstile: {
-      render: (
-        container: HTMLElement,
-        options: {
-          sitekey: string;
-          size?: 'normal' | 'compact' | 'invisible';
-          callback?: (token: string) => void;
-          'expired-callback'?: () => void;
-          'error-callback'?: () => void;
-        },
-      ) => string;
-      reset: (widgetId: string) => void;
-      execute: (widgetId: string) => void;
-    };
-  }
-}
 
 function extractDomain(raw: string): string {
   let normalized = raw.trim();
@@ -49,37 +32,6 @@ export function RoastForm() {
   const resultRef = useRef<RoastResult | null>(null);
   const navigatedRef = useRef(false);
 
-  // Turnstile refs
-  const turnstileContainerRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | null>(null);
-  const tokenCallbackRef = useRef<((token: string) => void) | null>(null);
-
-  function initTurnstile() {
-    const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    if (!sitekey || !turnstileContainerRef.current || widgetIdRef.current) return;
-    widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
-      sitekey,
-      size: 'invisible',
-      callback: (token: string) => {
-        if (tokenCallbackRef.current) {
-          tokenCallbackRef.current(token);
-          tokenCallbackRef.current = null;
-        }
-      },
-      'expired-callback': () => {
-        if (widgetIdRef.current) window.turnstile.reset(widgetIdRef.current);
-      },
-    });
-  }
-
-  async function getTurnstileToken(): Promise<string | null> {
-    if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || !widgetIdRef.current) return null;
-    return new Promise<string>((resolve) => {
-      tokenCallbackRef.current = resolve;
-      window.turnstile.execute(widgetIdRef.current!);
-    });
-  }
-
   function navigate(result: RoastResult) {
     if (navigatedRef.current) return;
     navigatedRef.current = true;
@@ -100,12 +52,10 @@ export function RoastForm() {
     navigatedRef.current = false;
 
     try {
-      const turnstileToken = await getTurnstileToken();
-
       const res = await fetch('/api/roast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url.trim(), turnstileToken }),
+        body: JSON.stringify({ url: url.trim() }),
       });
 
       if (!res.ok) {
@@ -205,18 +155,7 @@ export function RoastForm() {
 
   return (
     <>
-      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-        <Script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-          strategy="lazyOnload"
-          onLoad={initTurnstile}
-        />
-      )}
-
       <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto">
-        {/* Invisible Turnstile container */}
-        <div ref={turnstileContainerRef} style={{ display: 'none' }} />
-
         <div className="flex gap-2">
           <input
             type="text"
