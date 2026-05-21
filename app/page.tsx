@@ -34,7 +34,7 @@ export default async function HomePage() {
         </h1>
 
         <p className="text-zinc-400 font-mono text-[13px] sm:text-[15px] mb-8 fade-in-delay-2">
-          $ first the AI cooks you. then twitter finishes the job.
+          $ first the AI cooks you. then x finishes the job.
         </p>
 
         <div className="fade-in-delay-3 w-full flex justify-center">
