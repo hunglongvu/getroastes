@@ -23,6 +23,8 @@ export async function takeScreenshot(
   });
 
   if (!response.ok) {
+    const errorResponse = await response.text().catch(() => '(unreadable)');
+    console.error('Screenshot failed:', response.status, errorResponse);
     throw new Error(`Screenshot failed: HTTP ${response.status}`);
   }
 
