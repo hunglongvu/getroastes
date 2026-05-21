@@ -67,7 +67,7 @@ export async function GET(
             />
           )}
 
-          {/* LAYER 2 — gradient overlay: lighter top, darker bottom */}
+          {/* LAYER 2 — dark overlay */}
           <div
             style={{
               position: 'absolute',
@@ -75,13 +75,10 @@ export async function GET(
               left: 0,
               width: W,
               height: H,
+              background: 'rgba(0,0,0,0.72)',
               display: 'flex',
-              flexDirection: 'column',
             }}
-          >
-            <div style={{ width: W, height: H / 2, background: 'rgba(0,0,0,0.55)', display: 'flex' }} />
-            <div style={{ width: W, height: H / 2, background: 'rgba(0,0,0,0.88)', display: 'flex' }} />
-          </div>
+          />
 
           {/* LAYER 3 — content */}
           <div
@@ -173,12 +170,12 @@ export async function GET(
             <div style={{ display: 'flex', width: 800, justifyContent: 'center' }}>
               <span
                 style={{
-                  fontSize: 44,
+                  fontSize: 28,
                   fontFamily: 'Inter',
                   color: 'rgba(255,255,255,0.95)',
                   textAlign: 'center',
                   lineHeight: 1.55,
-                  fontWeight: 700,
+                  fontWeight: 600,
                 }}
               >
                 {roast.roast}
