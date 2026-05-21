@@ -289,6 +289,57 @@ body {
   }
 }
 
+/* ── Result page intro animations ── */
+
+.score-reveal {
+  animation: scoreSmash 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes scoreSmash {
+  0%   { opacity: 0; transform: scale(0.5);  color: #ffffff; }
+  40%  {             transform: scale(1.2);  color: #FF3B30; }
+  60%  {             transform: scale(0.95);               }
+  100% { opacity: 1; transform: scale(1);    color: #ff8c00; }
+}
+
+.tier-reveal {
+  animation: tierSlideUp 0.4s ease-out forwards;
+}
+
+@keyframes tierSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.roast-cursor {
+  display: inline-block;
+  color: #FF3B30;
+  animation: blink 0.8s step-start infinite;
+}
+
+.card-slide-in {
+  animation: cardSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateX(50px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .score-reveal,
+  .tier-reveal,
+  .card-slide-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    color: #ff8c00;
+  }
+  .roast-cursor {
+    animation: none;
+  }
+}
+
 .pokemon-card {
   position: relative;
 }

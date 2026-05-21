@@ -2,8 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getRoast, getRecentRoasts } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
-import { ShareButton } from '@/app/components/ShareButton';
-import CardImage from '@/app/components/CardImage';
+import RoastResult from '@/app/components/RoastResult';
 
 function timeAgo(createdAt: number): string {
   const diff = Date.now() - createdAt;
@@ -54,136 +53,11 @@ export default async function RoastPage({
           </Link>
         </div>
 
-        {/* Two-column layout */}
-        <div
-          className="flex flex-col md:flex-row"
-          style={{ gap: 48, alignItems: 'flex-start' }}
-        >
-          {/* LEFT — content */}
-          <div
-            className="order-2 md:order-1"
-            style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}
-          >
-            {/* Domain */}
-            <p
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.3)',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                marginBottom: 24,
-              }}
-            >
-              {roast.domain}
-            </p>
-
-            {/* Score row */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 20,
-                flexWrap: 'wrap',
-                marginBottom: 24,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 96,
-                  fontWeight: 900,
-                  color: '#ff8c00',
-                  lineHeight: 1,
-                  letterSpacing: -2,
-                  textShadow: '0 0 40px rgba(255,140,0,0.5)',
-                }}
-              >
-                {roast.score}%
-              </span>
-              <span
-                style={{
-                  fontSize: 40,
-                  fontWeight: 700,
-                  color: '#ff8c00',
-                  letterSpacing: 4,
-                  textShadow: '0 0 20px rgba(255,140,0,0.4)',
-                }}
-              >
-                COOKED
-              </span>
-            </div>
-
-            {/* Orange divider */}
-            <div
-              style={{
-                width: '100%',
-                height: 1,
-                background: 'rgba(255,140,0,0.35)',
-                marginBottom: 28,
-              }}
-            />
-
-            {/* Roast text — no wrapping quotes, model includes own formatting */}
-            <p
-              style={{
-                fontSize: 22,
-                fontWeight: 600,
-                color: '#ffffff',
-                lineHeight: 1.5,
-                marginBottom: 32,
-              }}
-            >
-              {roast.roast}
-            </p>
-
-            {/* Share button */}
-            <div style={{ marginBottom: 12 }}>
-              <ShareButton data={roast} />
-            </div>
-
-            {/* Hint */}
-            <p
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 12,
-                color: 'rgba(255,255,255,0.2)',
-                textAlign: 'center',
-                marginBottom: 20,
-              }}
-            >
-              // don&apos;t forget to attach the image
-            </p>
-
-            {/* Rank — below share button, small and quiet */}
-            <p
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 11,
-                color: '#666',
-              }}
-            >
-              🏆 #{rank} of {total?.toLocaleString() ?? '?'} roasted
-            </p>
-          </div>
-
-          {/* RIGHT — card image */}
-          <div
-            className="order-1 md:order-2"
-            style={{ flex: '1 1 0', minWidth: 0 }}
-          >
-            <div className="md:sticky" style={{ top: 24 }}>
-              <CardImage
-                src={`/api/card-image/${roast.id}`}
-                alt={`roast card for ${roast.domain}`}
-              />
-            </div>
-          </div>
-        </div>
+        {/* Animated two-column layout */}
+        <RoastResult roast={roast} rank={rank} total={total ?? 0} />
 
         {/* Recent roasts feed */}
         <div style={{ marginTop: 96 }}>
-          {/* Section header */}
           <div
             style={{
               display: 'flex',
@@ -194,28 +68,14 @@ export default async function RoastPage({
               marginBottom: 0,
             }}
           >
-            <span
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 11,
-                letterSpacing: '0.2em',
-                color: '#888',
-              }}
-            >
+            <span style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.2em', color: '#888' }}>
               RECENT ROASTS
             </span>
-            <span
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 11,
-                color: '#444',
-              }}
-            >
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#444' }}>
               last 8
             </span>
           </div>
 
-          {/* Feed rows */}
           <div>
             {recent.map((r) => {
               const isCurrent = r.id === id;
@@ -234,7 +94,6 @@ export default async function RoastPage({
                     background: isCurrent ? 'rgba(255,140,0,0.04)' : 'transparent',
                   }}
                 >
-                  {/* Score */}
                   <span
                     style={{
                       fontFamily: 'monospace',
@@ -249,26 +108,13 @@ export default async function RoastPage({
                     {r.score}%
                   </span>
 
-                  {/* Domain + excerpt */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span
-                        style={{
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          color: '#f5f5f5',
-                        }}
-                      >
+                      <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#f5f5f5' }}>
                         {r.domain}
                       </span>
                       {isCurrent && (
-                        <span
-                          style={{
-                            fontFamily: 'monospace',
-                            fontSize: 10,
-                            color: '#ff8c00',
-                          }}
-                        >
+                        <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ff8c00' }}>
                           ← you
                         </span>
                       )}
@@ -286,7 +132,6 @@ export default async function RoastPage({
                     </span>
                   </div>
 
-                  {/* Time ago */}
                   <span
                     style={{
                       fontFamily: 'monospace',
@@ -303,16 +148,10 @@ export default async function RoastPage({
             })}
           </div>
 
-          {/* Roast another */}
           <div style={{ marginTop: 40, textAlign: 'center' }}>
             <Link
               href="/"
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 12,
-                color: '#ff8c00',
-                textDecoration: 'none',
-              }}
+              style={{ fontFamily: 'monospace', fontSize: 12, color: '#ff8c00', textDecoration: 'none' }}
             >
               roast another →
             </Link>
