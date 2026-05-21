@@ -2,7 +2,8 @@ import { supabase } from './supabase';
 import type { RoastResult } from './types';
 
 export async function saveRoast(result: RoastResult): Promise<void> {
-  await supabase.from('roasts').insert({
+  console.log('saveRoast: screenshot_base64 length:', result.screenshotBase64?.length ?? 0);
+  const { error } = await supabase.from('roasts').insert({
     id: result.id,
     domain: result.domain,
     url: result.url,
@@ -17,6 +18,7 @@ export async function saveRoast(result: RoastResult): Promise<void> {
     excluded: false,
     screenshot_base64: result.screenshotBase64 ?? null,
   });
+  if (error) console.error('saveRoast error:', error.message, error.details);
 }
 
 export async function getRoast(id: string): Promise<RoastResult | null> {
