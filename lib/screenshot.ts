@@ -30,5 +30,6 @@ export async function takeScreenshot(
 
   const buffer = await response.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
+  console.log('Screenshot base64 length:', base64.length, 'bytes (~', Math.round(base64.length / 1024), 'KB)');
   return { base64, mediaType: 'image/jpeg' };
 }

@@ -29,10 +29,17 @@ export async function GET(
     const roast = await getRoast(id);
     if (!roast) return new Response('Not found', { status: 404 });
 
+    const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024; // 2MB
+    if (roast.screenshotBase64) {
+      console.log('Card screenshot base64 length:', roast.screenshotBase64.length, '/ limit:', MAX_SCREENSHOT_BYTES);
+    }
     const screenshotSrc =
-      roast.screenshotBase64 && roast.screenshotBase64.length < 200 * 1024
+      roast.screenshotBase64 && roast.screenshotBase64.length < MAX_SCREENSHOT_BYTES
         ? `data:image/jpeg;base64,${roast.screenshotBase64}`
         : null;
+    if (!screenshotSrc && roast.screenshotBase64) {
+      console.warn('Screenshot dropped: base64 length', roast.screenshotBase64.length, 'exceeds limit');
+    }
 
     const img = new ImageResponse(
       (
