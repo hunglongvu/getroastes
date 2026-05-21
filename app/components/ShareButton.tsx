@@ -72,12 +72,10 @@ export function ShareButton({ data }: { data: RoastResult }) {
     if (buttonState !== 'default') return;
     setButtonState('capturing');
 
-    const header = `just got my landing page roasted by AI 💀\n\n${data.domain} — cooked score: ${data.score}\n\n`;
-    const footer = `\n\ngetroasted.wtf 🔥`;
-    const maxRoast = 277 - header.length - footer.length;
-    let roastLine = data.roast;
-    if (roastLine.length > maxRoast) roastLine = roastLine.slice(0, maxRoast).replace(/\s+\S*$/, '');
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${header}${roastLine}${footer}`)}`;
+    const tweetText = data.score >= 50
+      ? `asked an AI to roast my landing page. didn't expect it to be this personal.\n\n${data.roast}\n\nyours would be worse. getroasted.wtf`
+      : `asked an AI to roast my landing page. it went easier than expected.\n\n${data.roast}\n\nyours would not. getroasted.wtf`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
 
     try {
       const response = await fetch(`/api/card-image/${data.id}`);
