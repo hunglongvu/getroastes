@@ -50,7 +50,7 @@ export default async function HomePage() {
         </div>
 
         <p className="mt-5 text-zinc-600 text-xs font-mono fade-in-delay-4">
-          3 free roasts/day · no signup · no mercy
+          warning: this will hurt your feelings.
         </p>
         <p className="font-mono text-sm mt-4 fade-in-delay-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
           🔥{' '}
