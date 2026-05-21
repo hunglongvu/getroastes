@@ -67,8 +67,9 @@ export async function GET(
     const roastText = roast.roast.replace(/^[“”‘’"']+|[“”‘’"']+$/g, '').trim();
 
     const PAD_H = 80;
-    const PAD_V = 40;
-    const CAT_H = 420;    // fixed container height — extra space goes above the cat
+    const PAD_V_TOP = 120;    // larger top pad places cat center at ~32% (optical balance)
+    const PAD_V_BOTTOM = 40;
+    const CAT_H = 420;
     const CAT_MAX_H = 420;
 
     const img = new ImageResponse(
@@ -126,8 +127,8 @@ export async function GET(
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              paddingTop: PAD_V,
-              paddingBottom: PAD_V,
+              paddingTop: PAD_V_TOP,
+              paddingBottom: PAD_V_BOTTOM,
               paddingLeft: PAD_H,
               paddingRight: PAD_H,
               overflow: 'hidden',
@@ -141,7 +142,7 @@ export async function GET(
                 flexShrink: 0,
                 width: '100%',
                 height: CAT_H,
-                alignItems: 'flex-end',
+                alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 20,
               }}
