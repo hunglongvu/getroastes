@@ -54,13 +54,14 @@ export async function GET(
             <img
               src={screenshotSrc}
               alt=""
-              width={W}
-              height={H}
               style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'top',
                 position: 'absolute',
                 top: 0,
                 left: 0,
-                objectFit: 'cover',
                 display: 'flex',
               }}
             />
