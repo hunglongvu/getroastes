@@ -22,7 +22,7 @@ export default async function HomePage() {
       <Embers />
 
       {/* 1 · Hero */}
-      <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-12 text-center">
+      <section id="hero" className="relative z-10 flex flex-col items-center justify-center px-4 pt-14 pb-6 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight leading-tight">
           <span style={{ color: 'rgba(255,255,255,0.7)' }} className="fade-in">First the AI roasts you.</span>
           <br />
@@ -52,7 +52,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2 · Hall of Shame preview */}
-      <section className="relative z-10 py-12 px-4 max-w-2xl mx-auto w-full fade-in-delay-4">
+      <section className="relative z-10 pt-6 pb-12 px-4 max-w-2xl mx-auto w-full fade-in-delay-4">
         <div style={{ width: '100%', height: 1, background: 'rgba(255,140,0,0.2)', marginBottom: 32 }} />
         <div className="mb-6">
           <p
