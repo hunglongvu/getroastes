@@ -40,7 +40,7 @@ export default function PrivacyPage() {
 
         <div style={{ marginBottom: 48 }}>
           <Link href="/" style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>
-            ← getroasted.wtf
+            ← back to getroasted.wtf
           </Link>
         </div>
 
@@ -98,9 +98,9 @@ export default function PrivacyPage() {
           <H3>2.4 Cookies and Similar Technologies</H3>
           <p style={{ ...body, marginBottom: 12 }}>We use ONLY essential cookies necessary for site operation:</p>
           <ul style={{ paddingLeft: 0, margin: '0 0 16px' }}>
-            <li style={li}>— <strong style={strong}>Cloudflare Turnstile cookies:</strong> Bot protection (deactivated in current version, may be re-enabled)</li>
+            <li style={li}>— <strong style={strong}>Cloudflare Turnstile cookies:</strong> Bot protection</li>
             <li style={li}>— <strong style={strong}>Vercel session cookies:</strong> Hosting infrastructure</li>
-            <li style={li}>— <strong style={strong}>Local Storage:</strong> Rate limit awareness (optional)</li>
+            <li style={li}>— <strong style={strong}>Local Storage:</strong> Cookie notice acceptance flag</li>
           </ul>
           <p style={{ ...body, marginBottom: 12 }}>We do <strong style={{ color: '#FF3B30' }}>NOT</strong> use:</p>
           <ul style={{ paddingLeft: 0, margin: '0 0 16px' }}>
@@ -118,79 +118,75 @@ export default function PrivacyPage() {
 
         {/* 3 */}
         <section style={{ marginBottom: 40 }}>
-          <H2>3. Third-Party Services</H2>
+          <H2>3. Third-Party Services and Data Processing Agreements</H2>
           <p style={{ ...body, marginBottom: 20 }}>
-            Some data is processed by third-party services. We have data processing agreements
-            (DPA) in place where required.
+            We have entered into Data Processing Agreements (DPAs) with all third-party service providers.
           </p>
 
-          {[
-            {
-              title: '3.1 Vercel Inc. (Hosting)',
-              items: [
-                ['Location', 'USA'],
-                ['Data transferred', 'IP address, requests, technical logs'],
-                ['Safeguard', 'EU Standard Contractual Clauses'],
-                ['Privacy policy', 'https://vercel.com/legal/privacy-policy'],
-              ],
-            },
-            {
-              title: '3.2 Anthropic PBC (AI Roast Generation)',
-              items: [
-                ['Location', 'USA'],
-                ['Data transferred', 'Submitted URLs, page content snippets'],
-                ['Safeguard', 'EU Standard Contractual Clauses'],
-                ['Note', 'Anthropic does not use API inputs for training'],
-                ['Privacy policy', 'https://anthropic.com/legal/privacy'],
-              ],
-            },
-            {
-              title: '3.3 Upstash Inc. (Rate Limiting)',
-              items: [
-                ['Location', 'Database in EU-Frankfurt; company USA'],
-                ['Data transferred', 'Hashed IP addresses'],
-                ['Safeguard', 'EU Standard Contractual Clauses'],
-                ['Privacy policy', 'https://upstash.com/trust/privacy.pdf'],
-              ],
-            },
-            {
-              title: '3.4 Supabase Inc. (Database)',
-              items: [
-                ['Location', 'EU region'],
-                ['Data transferred', 'Submitted URLs, roasts'],
-                ['Safeguard', 'EU hosting'],
-                ['Privacy policy', 'https://supabase.com/privacy'],
-              ],
-            },
-            {
-              title: '3.5 ScreenshotOne (Page Screenshots)',
-              items: [
-                ['Location', 'EU'],
-                ['Data transferred', 'URLs to be screenshotted'],
-                ['Privacy policy', 'https://screenshotone.com/privacy'],
-              ],
-            },
-            {
-              title: '3.6 Cloudflare Inc. (Bot Protection – Turnstile)',
-              items: [
-                ['Location', 'USA'],
-                ['Data transferred', 'IP address, browser fingerprint, device data'],
-                ['Safeguard', 'EU Standard Contractual Clauses'],
-                ['Privacy policy', 'https://cloudflare.com/privacypolicy'],
-              ],
-            },
-          ].map(({ title, items }) => (
-            <div key={title} style={{ marginBottom: 24 }}>
-              <H3>{title}</H3>
-              <ul style={{ paddingLeft: 0, margin: 0 }}>
-                {items.map(([k, v]) => (
-                  <li key={k} style={li}>
-                    — <strong style={strong}>{k}:</strong> {v}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div style={{ marginBottom: 24 }}>
+            <H3>3.1 Vercel Inc. (Hosting – Pro Plan)</H3>
+            <ul style={{ paddingLeft: 0, margin: 0 }}>
+              <li style={li}>— <strong style={strong}>Location:</strong> USA</li>
+              <li style={li}>— <strong style={strong}>Data transferred:</strong> IP address, requests, technical logs</li>
+              <li style={li}>— <strong style={strong}>Safeguard:</strong> EU Standard Contractual Clauses + DPA</li>
+              <li style={li}>— <strong style={strong}>DPA:</strong> https://vercel.com/legal/dpa (auto-incorporated via Pro Plan agreement)</li>
+              <li style={li}>— <strong style={strong}>Privacy policy:</strong> https://vercel.com/legal/privacy-policy</li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <H3>3.2 Anthropic PBC (AI Roast Generation)</H3>
+            <ul style={{ paddingLeft: 0, margin: 0 }}>
+              <li style={li}>— <strong style={strong}>Location:</strong> USA</li>
+              <li style={li}>— <strong style={strong}>Data transferred:</strong> Submitted URLs, page content snippets</li>
+              <li style={li}>— <strong style={strong}>Safeguard:</strong> EU Standard Contractual Clauses + DPA</li>
+              <li style={li}>— <strong style={strong}>Note:</strong> Anthropic does NOT use API inputs for training</li>
+              <li style={li}>— <strong style={strong}>DPA:</strong> https://www.anthropic.com/legal/data-processing-addendum (auto-incorporated via Commercial Terms of Service)</li>
+              <li style={li}>— <strong style={strong}>Privacy policy:</strong> https://anthropic.com/legal/privacy</li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <H3>3.3 Upstash Inc. (Rate Limiting)</H3>
+            <ul style={{ paddingLeft: 0, margin: 0 }}>
+              <li style={li}>— <strong style={strong}>Location:</strong> Database in EU-Frankfurt; company USA</li>
+              <li style={li}>— <strong style={strong}>Data transferred:</strong> Hashed IP addresses</li>
+              <li style={li}>— <strong style={strong}>Safeguard:</strong> EU Standard Contractual Clauses + DPA</li>
+              <li style={li}>— <strong style={strong}>DPA:</strong> https://upstash.com/static/trust/dpa.pdf (auto-incorporated via Terms of Service)</li>
+              <li style={li}>— <strong style={strong}>Privacy policy:</strong> https://upstash.com/trust/privacy.pdf</li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <H3>3.4 Supabase Inc. (Database)</H3>
+            <ul style={{ paddingLeft: 0, margin: 0 }}>
+              <li style={li}>— <strong style={strong}>Location:</strong> EU region</li>
+              <li style={li}>— <strong style={strong}>Data transferred:</strong> Submitted URLs, roasts</li>
+              <li style={li}>— <strong style={strong}>Safeguard:</strong> EU hosting + signed DPA</li>
+              <li style={li}>— <strong style={strong}>DPA:</strong> Executed via separate PandaDoc agreement</li>
+              <li style={li}>— <strong style={strong}>Privacy policy:</strong> https://supabase.com/privacy</li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <H3>3.5 ScreenshotOne (Page Screenshots)</H3>
+            <ul style={{ paddingLeft: 0, margin: 0 }}>
+              <li style={li}>— <strong style={strong}>Location:</strong> EU</li>
+              <li style={li}>— <strong style={strong}>Data transferred:</strong> URLs to be screenshotted</li>
+              <li style={li}>— <strong style={strong}>Privacy policy:</strong> https://screenshotone.com/privacy</li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <H3>3.6 Cloudflare Inc. (Bot Protection – Turnstile)</H3>
+            <ul style={{ paddingLeft: 0, margin: 0 }}>
+              <li style={li}>— <strong style={strong}>Location:</strong> USA</li>
+              <li style={li}>— <strong style={strong}>Data transferred:</strong> IP address, browser fingerprint, device data</li>
+              <li style={li}>— <strong style={strong}>Safeguard:</strong> EU Standard Contractual Clauses + DPA</li>
+              <li style={li}>— <strong style={strong}>DPA:</strong> https://www.cloudflare.com/cloudflare-customer-dpa/ (auto-incorporated via Cloudflare Terms)</li>
+              <li style={li}>— <strong style={strong}>Privacy policy:</strong> https://cloudflare.com/privacypolicy</li>
+            </ul>
+          </div>
         </section>
 
         <Divider />

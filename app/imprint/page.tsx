@@ -27,7 +27,7 @@ export default function ImprintPage() {
 
         <div style={{ marginBottom: 48 }}>
           <Link href="/" style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>
-            ← getroasted.wtf
+            ← back to getroasted.wtf
           </Link>
         </div>
 
