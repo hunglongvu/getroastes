@@ -39,10 +39,10 @@ const TEXT_SHADOW = '0 0 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7), 0 2px 8
 
 function getQuoteFontSize(text: string): number {
   const length = text.length;
-  if (length < 60) return 52;
-  if (length < 120) return 44;
-  if (length < 180) return 38;
-  return 34;
+  if (length < 60) return 48;
+  if (length < 120) return 40;
+  if (length < 180) return 34;
+  return 30;
 }
 
 export async function GET(
@@ -68,7 +68,8 @@ export async function GET(
 
     const PAD_H = 80;
     const PAD_V = 40;
-    const CAT_MAX_H = 400;
+    const CAT_H = 420;    // fixed container height — extra space goes above the cat
+    const CAT_MAX_H = 420;
 
     const img = new ImageResponse(
       (
@@ -132,16 +133,17 @@ export async function GET(
               overflow: 'hidden',
             }}
           >
-            {/* Cat — grows to fill space above text section */}
+            {/* Cat — fixed-height container, image anchors to bottom so extra
+                space goes above (fills the screenshot area), not below */}
             <div
               style={{
                 display: 'flex',
-                flexGrow: 1,
+                flexShrink: 0,
                 width: '100%',
-                alignItems: 'center',
+                height: CAT_H,
+                alignItems: 'flex-end',
                 justifyContent: 'center',
-                minHeight: 0,
-                marginBottom: 24,
+                marginBottom: 20,
               }}
             >
               {catSrc && (
@@ -160,118 +162,112 @@ export async function GET(
               )}
             </div>
 
-            {/* Text section */}
+            {/* Tier · Score% COOKED */}
             <div
               style={{
                 display: 'flex',
-                flexDirection: 'column',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                marginBottom: 12,
                 width: '100%',
                 flexShrink: 0,
-                alignItems: 'center',
               }}
             >
-              {/* Tier · Score% COOKED — centered */}
-              <div
+              <span
                 style={{
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  marginBottom: 12,
-                  width: '100%',
+                  fontSize: 78,
+                  fontWeight: 700,
+                  color: '#FF3B30',
+                  letterSpacing: 4,
+                  lineHeight: 1,
+                  textShadow: TEXT_SHADOW,
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 78,
-                    fontWeight: 700,
-                    color: '#FF3B30',
-                    letterSpacing: 4,
-                    lineHeight: 1,
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {tier.name}
-                </span>
-                <span
-                  style={{
-                    fontSize: 78,
-                    fontWeight: 700,
-                    color: '#ffffff',
-                    letterSpacing: 2,
-                    lineHeight: 1,
-                    marginLeft: 20,
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  · {roast.score}% COOKED
-                </span>
-              </div>
-
-              {/* Divider */}
-              <div
+                {tier.name}
+              </span>
+              <span
                 style={{
-                  width: '100%',
-                  height: 1,
-                  background: 'rgba(255,255,255,0.2)',
-                  marginBottom: 32,
-                  display: 'flex',
-                  flexShrink: 0,
-                }}
-              />
-
-              {/* Roast text — centered */}
-              <div
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  justifyContent: 'center',
-                  marginBottom: 28,
+                  fontSize: 78,
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  letterSpacing: 2,
+                  lineHeight: 1,
+                  marginLeft: 20,
+                  textShadow: TEXT_SHADOW,
                 }}
               >
-                <span
-                  style={{
-                    fontSize: getQuoteFontSize(roastText),
-                    fontWeight: 600,
-                    color: '#ffffff',
-                    lineHeight: 1.5,
-                    textAlign: 'center',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  &ldquo;{roastText}&rdquo;
-                </span>
-              </div>
+                · {roast.score}% COOKED
+              </span>
+            </div>
 
-              {/* Footer — domain left, brand right */}
-              <div
+            {/* Divider */}
+            <div
+              style={{
+                width: '100%',
+                height: 1,
+                background: 'rgba(255,255,255,0.2)',
+                marginBottom: 16,
+                display: 'flex',
+                flexShrink: 0,
+              }}
+            />
+
+            {/* Roast text */}
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <span
                 style={{
-                  display: 'flex',
-                  width: '100%',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  fontSize: getQuoteFontSize(roastText),
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  lineHeight: 1.5,
+                  textAlign: 'center',
+                  textShadow: TEXT_SHADOW,
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.3)',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {roast.domain}
-                </span>
-                <span
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.3)',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  getroasted.wtf
-                </span>
-              </div>
+                &ldquo;{roastText}&rdquo;
+              </span>
+            </div>
+
+            {/* Spacer — pushes footer to bottom */}
+            <div style={{ flexGrow: 1 }} />
+
+            {/* Footer — domain left, brand right */}
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.3)',
+                  textShadow: TEXT_SHADOW,
+                }}
+              >
+                {roast.domain}
+              </span>
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.3)',
+                  textShadow: TEXT_SHADOW,
+                }}
+              >
+                getroasted.wtf
+              </span>
             </div>
           </div>
         </div>
